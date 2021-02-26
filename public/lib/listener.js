@@ -15,15 +15,11 @@ function Listener(anim) {
     _elapsedTime = 0;
 
   function getMultiplier(t) {
-    // return Math.pow(Math.E, this.growRate * t);
     return _multiplier_in_server ? _multiplier_in_server : 2 ** (t / 1000 / 11);
   }
 
-
-
   var _tick = this.tick = () => {
-    _elapsedTime = Date.now() - _startTime;
-    _elapsedTime = Math.max(0, _elapsedTime)
+    _elapsedTime = Math.max(0, Date.now() - _startTime)
     // _elapsedTime = 600; - стояло .......
     _multiplier = getMultiplier(_elapsedTime);
     // if (_multiplier >= 2)
@@ -37,7 +33,7 @@ function Listener(anim) {
 
   var _user_id = -1
   var updateState = this.us = (status, date, multiplier_to_show) => {
-    console.log(`updateState   ${status}  ${date ? ((Date.now() - date) / 1000) : ''}   ${multiplier_to_show || ''}`)
+    // console.log(`updateState   ${status}  ${date ? ((Date.now() - date) / 1000) : ''}   ${multiplier_to_show || ''}`)
 
     _multiplier_in_server = multiplier_to_show || null
 
@@ -74,8 +70,8 @@ function Listener(anim) {
       _socket = new WebSocket(_url);
 
       _socket.onopen = function (e) {
-        // socket.send("Меня зовут Джон");
-        console.log('__connect__')
+        // socket.send("message");
+        // console.log('__connect__')
       };
 
       _socket.onmessage = ({ data }) => {
@@ -108,7 +104,7 @@ function Listener(anim) {
               case LISTENER_STATUS.CREATED:
               case LISTENER_STATUS.IN_PROGRESS:
               case LISTENER_STATUS.COMPLETED:
-                log(message.event_name)
+                // log(message.event_name)
                 updateState(
                   message.payload.status,
 
@@ -121,38 +117,37 @@ function Listener(anim) {
             }
             break;
           case 'countDownUpdate':
-            log(message.event_name)
+            // log(message.event_name)
             updateState(LISTENER_STATUS.CREATED,
               Date.now() + message.payload.countdown_time_remaining_ms
             );
             break;
           case 'multiplierUpdate':
-            log(message.event_name)
+            // log(message.event_name)
             updateState(LISTENER_STATUS.IN_PROGRESS,
               new Date(message.payload.started_at).getTime()
             );
             break;
           case 'playerUpdate':
-            console.log(message.payload)
+            // console.log(message.payload)
             if (_user_id == -1) {
               _user_id = message.payload.player.user_id
             }
-            let tlog = ''
+            // let tlog = ''
             if (_user_id == message.payload.player.user_id) {
-              tlog += '\n\tlistener ->' + message.payload.player.out_at_multiplier
+              // tlog += '\n\tlistener ->' + message.payload.player.out_at_multiplier
               _anim.set_win(message.payload.player.out_at_multiplier > 1.0)
             }
-            console.log(message.payload.player.user_id + " ->" + message.payload.player.out_at_multiplier + tlog)
+            // console.log(message.payload.player.user_id + " ->" + message.payload.player.out_at_multiplier + tlog)
             break;
           case 'onlineUpdate':
-            console.log(message.payload)
+            // console.log(message.payload)
             break;
           default:
 
-            console.log(message)
-            console.log(`event_name = ${message.event_name}\t status = ${message.payload.status}`)
-
-            log()
+            // console.log(message)
+            // console.log(`event_name = ${message.event_name}\t status = ${message.payload.status}`)
+            // log()
 
             break;
         }

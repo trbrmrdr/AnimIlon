@@ -1,0 +1,44 @@
+<head>
+    <style>
+        body,
+        html {
+            margin: 0px;
+            height: 100%;
+        }
+
+        canvas-container {
+            width: 100%;
+            height: 100%;
+
+            touch-action: none;
+            cursor: inherit;
+            display: block;
+        }
+
+        #canvas-container {
+            width: 40vw;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script src="./lib/v6.0.0-rc.2/pixi.js"></script>
+    <script src="./lib/dragonBones.js"></script>
+    <script src="./lib/listener.js"></script>
+    <script src="./lib/main.js"></script>
+
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
+    <script>
+        window.onload = function () {
+            const _anim = new Anim().init()
+            const _listener = new Listener(_anim).connectToServer('wss://ws.rocketcrash.vip/ws')
+        }
+    </script>
+
+
+
+
+</body>

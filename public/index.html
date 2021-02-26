@@ -25,6 +25,11 @@
         #events button {
             display: block;
         }
+
+        #stages,
+        .debug_btn {
+            display: none;
+        }
     </style>
 </head>
 
@@ -40,7 +45,7 @@
     <!-- <script src="./lib/main.js"></script>  -->
 
 
-    <script src="./dist/main.js?v=10.24"></script>
+    <script src="./dist/main.js?v=10.25"></script>
 
     <div id="stages" style="padding: 5px;
     border: solid 2px green;
@@ -54,25 +59,23 @@
             <br />
 
     </div>
-    <div id="canvas-container">
-        <canvas id="canvas"></canvas>
+
+
+    <div id="canvas-container"> <!--контейнер где лежит canvas с нужными размерами-->
+        <canvas id="canvas"></canvas> <!--сам canvas на котором рисуется анимашку-->
     </div>
 
-    <div id="anim_ilon">Анимации Илона<br></div>
-    <div id="anim_button">Анимации Кнопки<br></div>
-    <div id="anim_roket">Анимации Рокеты<br></div>
-    <div id="anim_Bang">Взрыв<br></div>
-
-
-
-
+    <div id="anim_ilon" class="debug_btn">Анимации Илона<br></div>
+    <div id="anim_button" class="debug_btn">Анимации Кнопки<br></div>
+    <div id="anim_roket" class="debug_btn">Анимации Рокеты<br></div>
+    <div id="anim_Bang" class="debug_btn">Взрыв<br></div>
 
     <script>
 
         window.onload = function () {
             const _anim = new Anim().init()
             // return
-            const _listener = new Listener(_anim) .connectToServer('wss://ws.rocketcrash.vip/ws')
+            const _listener = new Listener(_anim).connectToServer('wss://ws.rocketcrash.vip/ws')
 
 
             //Debug

@@ -1,6 +1,6 @@
 
 const HAS_DEBUG = false
-const HAS_STATS = true
+const HAS_STATS = false
 
 const DELAY_PRESSED_BTN = 920
 
@@ -136,10 +136,7 @@ function Anim() {
     }
 
     const list_animation = (armature, id_cont) => {
-        if (HAS_DEBUG == false) {
-            document.getElementById(id_cont).style.display = 'none'
-            return
-        }
+        if (!HAS_DEBUG) return
         armature.animation._animationNames.forEach((animation_name) => {
             var btn = document.createElement("button");
             btn.innerHTML = animation_name;
@@ -151,9 +148,6 @@ function Anim() {
 
     function start_anim(init = false) {
         if (init) {
-            if (HAS_DEBUG == false) {
-                document.getElementById("stages").style.display = 'none'
-            }
             const add_btn = (name, enabled = false) => {
                 const btn = _btn[name] = document.createElement("button");
                 btn.innerHTML = name;
@@ -190,7 +184,7 @@ function Anim() {
         text_idly_anim()
 
         let _delay_to_start = Math.max(DELAY_PRESSED_BTN, _delay_ms - DELAY_PRESSED_BTN)
-        console.log(`ANIM start_after = ${_delay_to_start}`)
+        // console.log(`ANIM start_after = ${_delay_to_start}`)
         _time_to_start = Date.now() + _delay_to_start
         // console.log(_delay_to_start)
 
@@ -238,14 +232,8 @@ function Anim() {
     var _room = new (function () {
 
         var _has_win = false;
-
-        // var _last_state = -1
         this.setState = (state, is_safe) => {
-            // if (_last_state === state) return
-            // _last_state = state
             if (is_safe && _time_to_start == -1) return
-
-            _arms.text_сrach.visible = false;
 
             const factory = dragonBones.PixiFactory.factory;
             let knopka_slot = _arms.button.armature.getSlot("knopka_off");
@@ -255,11 +243,6 @@ function Anim() {
                         _has_win = false
                         break
                     }
-
-                    _arms.text_сrach.visible = true
-                    _arms.text_сrach.text = "crash"
-                    // _arms.text_сrach.x = _arms.text.x + _arms.text.width + 5
-                    // _arms.text_сrach.y = _arms.text.y + _arms.text.height * 0.5
 
                     _arms.room.animation.play(ANIM_Room.Stop)
                     factory.replaceSlotDisplay("", "Button_state", "button", "stop", knopka_slot);
@@ -276,8 +259,6 @@ function Anim() {
                     break;
                 case ANIM_Room.Win:
                     _has_win = true;
-                    _arms.text_сrach.visible = true
-                    _arms.text_сrach.text = "cash"
 
                     _arms.room.animation.play(ANIM_Room.Win)
                     factory.replaceSlotDisplay("", "Button_state", "button", "win", knopka_slot);
@@ -382,9 +363,9 @@ function Anim() {
                 _timer_see_watch = now
                 // if (_time_to_start == -1)
                 _show_see = Date.now() + (3 + Math.random() * 7) * 1000
-                console.log("-loong")
+                // console.log("-loong")
             }
-            console.log("посмотрит на часы через", _show_see - now)
+            // console.log("посмотрит на часы через", _show_see - now)
             if (now >= _show_see) {
                 _show_see *= 99 ** 9
                 _arms.ilon.animation.play(ANIM_Ilon.Wait_swatch);
@@ -524,7 +505,7 @@ function Anim() {
                 if (_time_to_start > 0 && isActive(STAGE_NAMES.PressBtn, false)) {
                     let elapsed = _time_to_start - Date.now()
                     if (elapsed <= 2500) {
-                        console.log('elapsed', elapsed)
+                        // console.log('elapsed', elapsed)
                         _arms.ilon.animation.play(ANIM_Ilon.Wait);
                         break
                     }
@@ -918,16 +899,6 @@ function Anim() {
         _arms.button.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿button, this);
         list_animation(_arms.button, "anim_button")
 
-        _arms.text_сrach = new PIXI.Text('crash', new PIXI.TextStyle({
-            fontFamily: 'Bahnschrift',
-            fontSize: 40,
-            fontWeight: 'bold',
-            fill: '#ffffff'
-        }));
-        _arms.text_сrach.visible = false
-        _arms.text_сrach.x = 415;
-        _arms.text_сrach.y = 94;
-
         _room.setState(ANIM_Room.Wait)
 
         //______________________________________________________________________________________________
@@ -1003,8 +974,7 @@ function Anim() {
         _stage.addChild(
             _arms.room,
             _arms.text,
-            _arms.ilon,
-            _arms.text_сrach
+            _arms.ilon
         )
 
         _arms.mask_objs.init()
