@@ -22,7 +22,18 @@ gulp.task('scripts', function () {
         // "./lib/GradientResource.js",
         // "./lib/helper.js",
         "./public/lib/listener.js",
+
+        "./public/lib/Stars.js",
+        "./public/lib/ClipMask.js",
+        "./public/lib/Room.js",
+        "./public/lib/Tablo.js",
+        "./public/lib/Bang.js",
+
+
+        "./public/lib/const.js",
+
         "./public/lib/main.js"
+        
     ])
 
         // .pipe(babel({
@@ -31,7 +42,7 @@ gulp.task('scripts', function () {
         // .pipe(browserify())
 
         // .pipe(javascriptObfuscator())
-        // .pipe(uglify())
+        .pipe(uglify())
 
         .pipe(concat('main.js')) // в какой файл объединить
         .pipe(gulp.dest('./public/dist/'))
@@ -54,19 +65,16 @@ gulp.task('server', gulp.series('scripts', function (done) {
     console.log(' task -> server')
 
     browserSync.init({
-        // injectChanges: true,
         server: {
             baseDir: "./public/",
-            // directory: "./",
-            index: "index.html"
+            index: "index_dev.html"
         },
-        // directory: true
     });
 
 
     gulp.watch("./public/lib/*.js").on('change', gulp.series('js_watch'));
     gulp.watch("./public/*.js").on('change', gulp.series('js_watch'));
-    // gulp.watch("*.js").on('change', browserSync.reload);
+    gulp.watch("*.js").on('change', browserSync.reload);
 
     gulp.watch("./public/*.html").on('change', browserSync.reload);
     gulp.watch("./public/data/*.*").on('change', browserSync.reload);
@@ -82,6 +90,15 @@ gulp.task('release_src', function () {
     return gulp.src([
         "./public/lib/dragonBones.js",
         "./public/lib/listener.js",
+
+        "./public/lib/const.js",
+
+        "./public/lib/Stars.js",
+        "./public/lib/ClipMask.js",
+        "./public/lib/Room.js",
+        "./public/lib/Tablo.js",
+        "./public/lib/Bang.js",
+
         "./public/lib/main.js"
     ])
 

@@ -1,76 +1,4 @@
 
-const HAS_DEBUG = false
-const HAS_STATS = false
-
-const DELAY_PRESSED_BTN = 920
-
-const ANIM_Bang = {
-    Bang: "взрыв",
-    Loop: "цикл",
-    Out: "выход"
-}
-const ANIM_Ilon = {
-    Wait: "10_wait_(idle)",
-    Wait_sbtn: "10_wait_(see_button)",
-    Wait_swatch: "10_wait_(see_watch)",
-
-    Press_Button: "20_press_button",
-    Press_Button_Wait: "21_wait",
-    Explosed_0: "31_explosed",
-
-    RocketTakes_Start: "30_rocket_takes_off-start",
-    RocketTakes_Wait: "31_wait",
-    Explosed_1: "32_explosed",
-
-    TwoHand_Start: "320_two_hands",
-    TwoHand_Wait: "321_wait",
-    Explosed_2: "33_explosed",
-
-    Explosed_Wait: "40_wait",
-    End: "41_to_end",
-}
-
-const ANIM_Button = {
-    // Press: "press",
-    Reload: "reload",
-    Wait_Off: "wait_off",
-    Wait_On: "wait_on",
-    Wait_On_Idly: "wait_on_idly",
-
-    Wait_static: "wait_static",
-}
-
-// Main_scene
-const ANIM_Main_scene = {
-    Wait: "wait",
-    Reload: "reload",
-    Start: "start",
-    Fly: "fly",
-    Fly_circle: "fly_circle",
-}
-
-const ANIM_Mask = {
-    Wait: 'wait',
-    Start: 'start'
-}
-
-const STAGE_NAMES = {
-    Start: "Start",
-    PressBtn: "Press_Button",
-    RocketTakes: "Rockets_Takes",
-    TwoHand: "Two_Hand",
-
-    End_wait: "End_wait",
-    End: "End",
-}
-
-const ANIM_Room = {
-    Stop: "stop",
-    Wait: "wait",
-    Work: "work",
-    Win: "win",
-}
-
 function Anim() {
     var _btn = {};
 
@@ -91,13 +19,14 @@ function Anim() {
         })
     }
 
-    function isActive(s_name, clear = true) {
+    function _isActive(s_name, clear = true) {
         let ret = _btn[s_name].style.backgroundColor !== "";
         if (ret && clear) {
             setStage(s_name, false)
         }
         return ret;
     }
+    this.isActive = _isActive
 
     function __debug_select_stage(s_name) {
         if (_btn[s_name].style.opacity < 1.) return;
@@ -135,12 +64,23 @@ function Anim() {
         }
     }
 
+
+    function __debug_play_anim(armature, name_anim) {
+        console.log(name_anim, "______")
+        armature.visible = true;
+        armature.animation.play(name_anim)
+
+        // if (//armature == _arms.main &&
+        //     name_anim == ANIM_Main_scene.Start)
+        //     _arms.mask.animation.play(ANIM_Mask.Start);
+    }
+
     const list_animation = (armature, id_cont) => {
         if (!HAS_DEBUG) return
         armature.animation._animationNames.forEach((animation_name) => {
             var btn = document.createElement("button");
             btn.innerHTML = animation_name;
-            btn.addEventListener("click", () => { click_fun(armature, animation_name) });
+            btn.addEventListener("click", () => { __debug_play_anim(armature, animation_name) });
             document.getElementById(id_cont).appendChild(btn);
         })
     }
@@ -175,11 +115,16 @@ function Anim() {
     }
 
 
-
     var _handler_press = null,
         _time_to_start = -1,//-1 - если соединения ещё небыло
         _del_to_pressed = DELAY_PRESSED_BTN,
         _time_press = 0;
+
+
+    this.hasConnected = () => {
+        return _time_to_start > 0
+    }
+
     this.start_after = (_delay_ms) => {
         text_idly_anim()
 
@@ -188,9 +133,8 @@ function Anim() {
         _time_to_start = Date.now() + _delay_to_start
         // console.log(_delay_to_start)
 
-
-        // перемотка из грусной эмоции]
-        if (isActive(STAGE_NAMES.End_wait, false)) {
+        // перемотка из грусной эмоции
+        if (_isActive(STAGE_NAMES.End_wait, false)) {
             clearStage()
             setStage(STAGE_NAMES.End)
 
@@ -229,58 +173,6 @@ function Anim() {
             _room.setState(ANIM_Room.Win, true)
     }
 
-    var _room = new (function () {
-
-        var _has_win = false;
-        this.setState = (state, is_safe) => {
-            if (is_safe && _time_to_start == -1) return
-
-            const factory = dragonBones.PixiFactory.factory;
-            let knopka_slot = _arms.button.armature.getSlot("knopka_off");
-            switch (state) {
-                case ANIM_Room.Stop:
-                    if (_has_win) {
-                        _has_win = false
-                        break
-                    }
-
-                    _arms.room.animation.play(ANIM_Room.Stop)
-                    factory.replaceSlotDisplay("", "Button_state", "button", "stop", knopka_slot);
-                    break;
-                case ANIM_Room.Work:
-                    if (_has_win) break
-                    _arms.room.animation.play(ANIM_Room.Work)
-                    factory.replaceSlotDisplay("", "Button_state", "button", "work", knopka_slot);
-                    break;
-                case ANIM_Room.Wait:
-                    _has_win = false
-                    _arms.room.animation.play(ANIM_Room.Wait)
-                    factory.replaceSlotDisplay("", "Button_state", "button", "wait", knopka_slot);
-                    break;
-                case ANIM_Room.Win:
-                    _has_win = true;
-
-                    _arms.room.animation.play(ANIM_Room.Win)
-                    factory.replaceSlotDisplay("", "Button_state", "button", "win", knopka_slot);
-                    break;
-            }
-
-        }
-    })()
-
-    var f = [
-        '',
-        '.',
-        '..',
-        '...',
-        ' ...',
-        '  ...',
-        '   ..',
-        '    .',
-        '     ',
-    ];
-
-
     var _has_timer = false
 
     function text_idly_anim() {
@@ -301,7 +193,7 @@ function Anim() {
                     // console.log(elapsed / 1000)
                     left += elapsed
                 }
-                _arms.text.text = `${(left / 1000).toFixed(2)}sec`
+                _tablo.setLeftTime(left)
             }
 
             setTimeout(loop, 50);
@@ -309,7 +201,7 @@ function Anim() {
         loop();
     }
 
-    const MAX_MULTIP = 3112.52
+
     this.setMultiplier = (tick, multip) => {
         _app.ticker.add(() => {
 
@@ -331,15 +223,13 @@ function Anim() {
                     // _forces.TwoHand()
                 }
             } else {
-                //показываем только до первого подключения - после обязательно выключаем
-                if (_time_to_start == -1)
-                    _arms.text.text = f[Math.floor((Date.now() / 100) % f.length)];
+                _tablo.updateIdly()
                 return
             }
 
             out_multip = Math.min(out_multip, MAX_MULTIP)
 
-            _arms.text.text = `x${out_multip.toFixed(2)}`
+            _tablo.setMultiplier(out_multip)
 
         });
     }
@@ -375,23 +265,14 @@ function Anim() {
         }
 
         this.hide_bang = () => {
-            if (_arms.bang.visible === true) {
-                _arms.bang.animation.play(ANIM_Bang.Out)
+            if (_bang.Hide()) {
                 _arms.main.animation.play(ANIM_Main_scene.Reload);
             }
         }
 
         this.set_up_button = () => {
-            if (_arms.button.animation.lastAnimationState &&
-                [
-                    ANIM_Button.Wait_On,
-                    ANIM_Button.Wait_On_Idly,
-                    ANIM_Button.Wait_static
-                ].includes(_arms.button.animation.lastAnimationState.name)
-            ) return;
+            if (!_room.setUp()) return
 
-            _room.setState(ANIM_Room.Wait)
-            _arms.button.animation.play(ANIM_Button.Reload);
             _timer_see_watch = Date.now()
             // Илон ещё выходит из грусной эмойии
             _show_see = Date.now() + Math.random() * 1000
@@ -444,7 +325,7 @@ function Anim() {
         this.RoketTakes = () => {
             _type_start = 1
             _arms.ilon.animation.play(ANIM_Ilon.RocketTakes_Start);
-            _arms.button.animation.play(ANIM_Button.Wait_Off);
+            _room.Off()
         }
 
         this.TwoHand = () => {
@@ -464,14 +345,12 @@ function Anim() {
             if (_handle_started_roket) clearTimeout(_handle_started_roket)
 
             if (safe) {
-                _arms.bang.visible = true
-
                 if (_main_scene_is_started) {
                     _arms.main.animation.play(ANIM_Main_scene.Wait);
-                    _arms.bang.animation.play(ANIM_Bang.Loop);
-                    _safe_bang = true
+                    _bang.toLoop()
                 } else {
-                    _arms.bang.animation.play(ANIM_Bang.Bang)
+                    _bang.toBang()
+                    
                 }
             }
 
@@ -502,7 +381,7 @@ function Anim() {
                 // arm_ilon.animation.fadeIn(ANIM_Ilon.Press_Button);
 
                 //по таймеру включится кнопка - пока ждём и перключаем анимации ожидания
-                if (_time_to_start > 0 && isActive(STAGE_NAMES.PressBtn, false)) {
+                if (_time_to_start > 0 && _isActive(STAGE_NAMES.PressBtn, false)) {
                     let elapsed = _time_to_start - Date.now()
                     if (elapsed <= 2500) {
                         // console.log('elapsed', elapsed)
@@ -523,7 +402,7 @@ function Anim() {
                 break;
             case ANIM_Ilon.Press_Button:
             case ANIM_Ilon.Press_Button_Wait:
-                if (isActive(STAGE_NAMES.RocketTakes)) {
+                if (_isActive(STAGE_NAMES.RocketTakes)) {
                     _forces.RoketTakes()
                     break;
                 }
@@ -531,20 +410,19 @@ function Anim() {
                 PIXI.Ticker.shared.speed = 1;
                 // if (event.animationState.name !== ANIM_Ilon.Press_Button_Wait)
                 _arms.ilon.animation.play(ANIM_Ilon.Press_Button_Wait);
-                _arms.button.visible = true
-                _arms.button.animation.play(ANIM_Button.Wait_Off);
+                _room.Off()
                 break;
 
             case ANIM_Ilon.RocketTakes_Start:
             case ANIM_Ilon.RocketTakes_Wait:
                 if (
-                    isActive(STAGE_NAMES.End_wait, false) ||
-                    isActive(STAGE_NAMES.End, false)
+                    _isActive(STAGE_NAMES.End_wait, false) ||
+                    _isActive(STAGE_NAMES.End, false)
                 ) {
                     _forces.Exploded()
                     break
                 }
-                if (isActive(STAGE_NAMES.TwoHand)) {
+                if (_isActive(STAGE_NAMES.TwoHand)) {
                     _forces.TwoHand()
                     break;
                 }
@@ -554,8 +432,8 @@ function Anim() {
             case ANIM_Ilon.TwoHand_Start:
             case ANIM_Ilon.TwoHand_Wait:
                 if (
-                    isActive(STAGE_NAMES.End_wait, false) ||
-                    isActive(STAGE_NAMES.End, false)
+                    _isActive(STAGE_NAMES.End_wait, false) ||
+                    _isActive(STAGE_NAMES.End, false)
                 ) {
                     _forces.Exploded()
                     break
@@ -568,7 +446,7 @@ function Anim() {
             case ANIM_Ilon.Explosed_1:
             case ANIM_Ilon.Explosed_2:
             case ANIM_Ilon.Explosed_Wait:
-                if (isActive(STAGE_NAMES.End)) {
+                if (_isActive(STAGE_NAMES.End)) {
                     _arms.ilon.animation.play(ANIM_Ilon.End);
                     break;
                 }
@@ -585,41 +463,19 @@ function Anim() {
         }
     }
 
-    function _ActionEventHandler＿button(event) {
-        // console.log(event)
-        switch (event.animationState.name) {
-            case ANIM_Button.Reload:
-                _arms.button.animation.play(ANIM_Button.Wait_On_Idly);
-                break;
-            case ANIM_Button.Wait_On:
-            case ANIM_Button.Wait_On_Idly:
-                if (isActive(STAGE_NAMES.PressBtn, false)) {
-                    // _arms.button.animation.play(ANIM_Button.Wait_static);
-                    break;
-                }
-                if (event.animationState.name !== ANIM_Button.Wait_On_Idly)
-                    _arms.button.animation.play(ANIM_Button.Wait_On_Idly);
-                else
-                    _arms.button.animation.play(ANIM_Button.Wait_On);
-                break;
-            // case ANIM_Button.Press:
-            case ANIM_Button.Wait_Off:
-                // _arms.button.visible = true;
-                break;
-        }
-    }
+
 
     var _main_scene_is_started = false
     function _ActionEventHandler＿main(event) {
         _main_scene_is_started = false;
         switch (event.animationState.name) {
             case ANIM_Main_scene.Reload:
-                _star_is_work = false;
+                _stars.setEnable(false)
                 _arms.main.animation.play(ANIM_Main_scene.Wait);
                 break;
             case ANIM_Main_scene.Start:
                 _arms.main.animation.play(ANIM_Main_scene.Fly);
-                _star_is_work = true;
+                _stars.setEnable(true)
                 break
             case ANIM_Main_scene.Fly:
                 _arms.main.animation.play(ANIM_Main_scene.Fly_circle);
@@ -632,408 +488,68 @@ function Anim() {
         }
     }
 
-    function _ActionEventHandler＿Mask(event) {
-        switch (event.animationState.name) {
-            case ANIM_Mask.Wait:
-                // -будет закикливание так как анимашка 1 кдровая
-                _arms.mask.animation.stop()
-                console.log("mask_stop")
-                break;
-            case ANIM_Mask.Start:
-                _arms.mask.animation.play(ANIM_Mask.Wait);
-                break;
-        }
-    }
-
-    var _safe_bang = false
-    function _ActionEventHandler＿Bang(event) {
-        switch (event.animationState.name) {
-            case ANIM_Bang.Bang:
-                // if (_safe_bang) {
-                _arms.bang.animation.play(ANIM_Bang.Loop);
-                // } else {
-                // _arms.bang.animation.play(ANIM_Bang.Out);
-                // _arms.main.animation.play(ANIM_Main_scene.Reload);
-                // }
-                break
-            case ANIM_Bang.Loop:
-                _arms.bang.animation.play(ANIM_Bang.Loop);
-                break;
-            case ANIM_Bang.Out:
-                _arms.bang.visible = false;
-                _arms.bang.animation.stop()
-                break;
-        }
-    }
-
-    function _set_pos(armature) {
-        //arm_ilon.scale.set(0.5);
-        armature.x = _config.width * 0.5 * armature.scale.x;
-        armature.y = _config.height * 0.5 * armature.scale.y;
-    }
-
-    var _back = {
-        grad: null,
-        width: 600,
-        height: 4247,
-
-        earth: null,
-    };
-
     var _arms = {
         main: null,
-        button: null,
         lon: null,
-        bang: null,
-
-
-        mask: null,
-        mask_objs: new (function () {
-
-            var rt_mask = null;
-            var rt_roket_zone = null;
-            var _update = false;
-
-            this.update = () => {
-                if (!_update) return
-                if (!_arms.mask) return
-
-                //маска иногда недоигрывает до конца - и режит не всё
-                // if (_arms.mask.animation.lastAnimationName == ANIM_Mask.Start
-                //     && _arms.mask.animation.isPlaying == false)
-                //     _arms.mask.animation.play(ANIM_Mask.Wait);
-                _set_pos(_arms.mask)//маску вытащил из анимации - контролируем её в коде
-                // _rt_s.x = -100
-                // _rt_s.y = 100
-                // _arms.mask.mask = _rt_s
-
-                _stage.setChildIndex(rt_mask.s, _stage.children.length - 1)
-                _app.renderer.render(_arms.mask, rt_mask.rt);
-
-
-                _stage.setChildIndex(rt_roket_zone.s, _stage.children.length - 1)
-
-                _app.renderer.render(_star_container, rt_roket_zone.rt);
-                _app.renderer.render(_arms.main, rt_roket_zone.rt, false);
-                _app.renderer.render(_arms.bang, rt_roket_zone.rt, false);
-
-                // _arms.main.mask = rt_mask.s
-                // _arms.bang.mask = rt_mask.s
-                rt_roket_zone.s.mask = rt_mask.s
-
-                // console.log(_arms.main.animation);
-            }
-
-            function create_rt() {
-                const baseRenderTexture = new PIXI.BaseRenderTexture({
-                    width: _config.width,
-                    height: _config.height
-                });
-                // const baseRenderTexture = new PIXI.BaseRenderTexture(width, height, PIXI.SCALE_MODES.LINEAR, 1);
-                var _rt_mask = new PIXI.RenderTexture(baseRenderTexture);
-                var _rt_s_mask = new PIXI.Sprite(_rt_mask);
-                return {
-                    rt: _rt_mask,
-                    s: _rt_s_mask,
-                }
-            }
-
-            this.init = () => {
-
-                rt_mask = create_rt()
-                rt_roket_zone = create_rt()
-
-                // const gradBaseTexture = new PIXI.BaseTexture(new GradientResource());
-                // gradBaseTexture.setSize(1, _back.height);
-
-                createStar()
-                _stage.addChild(
-                    rt_mask.s,
-                    rt_roket_zone.s
-                    // createStar(),
-                    // _arms.main,
-                    // _arms.bang,
-                );
-
-                _update = true;
-
-                _forces.set_up_roket()
-
-                _app.ticker.add(_arms.mask_objs.update);
-
-            }
-
-        }
-        )()
     };
 
-    var _star_container,
-        _star_is_work = false;
-    function createStar() {
-
-        const star_width = _config.width,
-            star_height = _config.height
-
-
-        // Create a ParticleContainer for stars
-        var numStars = 1500;
-
-        _star_container = new PIXI.Container()
-
-        var particle_containter = new PIXI.ParticleContainer(numStars, {
-            vertices: true,
-            position: true,
-            rotation: false,
-            uvs: false,
-            tint: true
-        });
-
-
-
-        var fon = PIXI.Sprite.from('/data/10px_back.jpg')
-        fon.scale.set(100)
-        fon.x = 0
-
-        _star_container.addChild(fon, particle_containter)
-
-        const starTexture = PIXI.Texture.from('/data/star.png');//128
-        // Create our star sprites
-        var star;
-        for (var i = 0; i < numStars; i++) {
-            // const starTexture = PIXI.Texture.from(`/data/stars/s__(${1 + Math.round(Math.random() * 140)}).png`);
-            //1-3 px
-
-            // Make star speed & size scale non-linearly - there should be more far away than close
-            let scaleFactor = Math.pow(i, 3) / Math.pow(numStars, 3)
-            scaleFactor *= .3
-            // Create a star sprite
-            let star = new PIXI.Sprite(starTexture);
-            star.anchor.set(0.5);
-            // Make stars progressively bigger as we add them, effectively z-sorting
-            star.scale.set((scaleFactor / 20) + 0.01);
-            star.dLife = scaleFactor * 100
-            // Make sure larger stars move faster
-            star.dy = 5 * scaleFactor;
-            star.factor = 1
-            star.increment = Math.random() * .003
-
-            // Move the stars to a random location on the screen
-            star.position.x = Math.random() * star_width;
-            star.position.y = Math.random() * star_height;
-            particle_containter.addChild(star);
-
-
-        }
-
-
-        function resetStar(star) {
-            star.position.x = Math.random() * star_width;
-            star.position.y -= Math.sign(fieldSpeed) * star_height;
-        }
-
-        var fieldSpeed = .3
-        _app.ticker.add(function (delta) {
-            if (!_star_is_work) return;
-
-            particle_containter.children.map(star => {
-
-                if (star.alpha > 1) {
-                    star.factor = -1;
-                }
-                else if (star.alpha <= 0) {
-                    star.factor = 1;
-
-                }
-
-                // star.alpha += star.increment * star.factor;
-
-                if (star.scale.x <= 0.02)
-                    star.alpha = Math.sin(Date.now() * star.increment + star.dLife)
-
-                star.position.y += ((star.dy + 2) * fieldSpeed) * delta;
-                if (star.position.y < 0 || star.position.y > star_height) {
-                    resetStar(star);
-                }
-            });
-
-        });
-
-
-        return _star_container
-    }
-
-
-
+    var _stars, _clip_mask,_bang;
+    var _room = new Room(this)
+    var _tablo = new Tablo(this)
 
     function _onAssetsLoaded(loader, res) {
 
-        const factory = dragonBones.PixiFactory.factory;
+        const pf_parsed = dragonBones.PixiFactory.factory;
 
-        factory.parseDragonBonesData(res.skeleton.data);
-        factory.parseTextureAtlasData(res.texture_json.data, res.texture_png.texture);
+        pf_parsed.parseDragonBonesData(res.skeleton.data);
+        pf_parsed.parseTextureAtlasData(res.texture_json.data, res.texture_png.texture);
 
         //______________________________________________________________________________________________
-        _arms.ilon = factory.buildArmatureDisplay('Ilon');
+        _arms.ilon = pf_parsed.buildArmatureDisplay('Ilon');
         _arms.ilon.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿ilon, this);
-        // arm_ilon.on(dragonBones.EventObject.COMPLETE, _ActionEventHandler＿ilon, this);
-        _set_pos(_arms.ilon)
+        SetPos(_arms.ilon)
         list_animation(_arms.ilon, "anim_ilon")
 
         //______________________________________________________________________________________________
-
-        _arms.room = factory.buildArmatureDisplay('Room');
-        // _arms.room.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler__room, this);
-        _set_pos(_arms.room)
-
+        _room.init(pf_parsed, _stage, _arms.ilon)
         //______________________________________________________________________________________________
 
-        //кнопки
-        _arms.ilon.children.forEach((el) => {
-            if (_arms.button) return
-            if (el instanceof dragonBones.PixiArmatureDisplay) {
-                if (el.armature.name == "Button") {
-                    _arms.button = el
-                }
-            }
-        })
-        _arms.button.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿button, this);
-        list_animation(_arms.button, "anim_button")
-
-        _room.setState(ANIM_Room.Wait)
-
-        //______________________________________________________________________________________________
-
-        _arms.main = factory.buildArmatureDisplay('Main_scene');
+        _arms.main = pf_parsed.buildArmatureDisplay('Main_scene');
         _arms.main.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿main, this);
-        _set_pos(_arms.main)
+        SetPos(_arms.main)
         list_animation(_arms.main, "anim_roket")
+        //______________________________________________________________________________________________
 
+        _bang = new Bang(pf_parsed)
 
-        //люютый косяк - но по другому никак ненайти внутренни объект - 
+        //_____________________________________________________________________________________________
+        _tablo.init(_stage)
+
+        //______________________________________________________________________________________________
+        _stage.addChild(_arms.ilon)
+
+        _stars = new Stars(_app)
+
         //в проекте управление маской происходит - в коде ест ьпротупы если проект неактивен!!!!!!!!!!!!
-        _arms.main.children.forEach((el) => {
-            if (_arms.mask) return
-            if (el instanceof dragonBones.PixiArmatureDisplay) {
-                if (el.armature.name == "Mask") {
-                    _arms.mask = el
-                }
-            }
-        })
-        // _arms.mask = factory._dragonBonesDataMap['Ilon'].armatures['Mask']
-        // var t_id = factory._dragonBonesDataMap['Ilon'].armatures['Mask'].hashCode
-        // // console.log(factory.a    rmatures['Main_scene'].bones)
-        // _arms.main.armature.getSlots().forEach((el) => {
-        //     console.log(el.hashCode)
-        //     if (t_id == el.hashCode)
-        //         console.log(el.hashCode)
-        // })
-        // _arms.main.children.forEach((el) => {
-        //     console.log(el.hashCode)
-        //     // if(el instanceof PixiArmatureDisplay)
+        _clip_mask = new ClipMask(_stage, _arms.main)
 
-        // })
-
-        // _arms.mask = factory.buildArmatureDisplay('Mask');
-        // _arms.mask.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿Mask, this);
-        // _set_pos(_arms.mask)
-
-        //______________________________________________________________________________________________
-
-        _arms.bang = factory.buildArmatureDisplay('Bang');
-        _arms.bang.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿Bang, this);
-        _set_pos(_arms.bang)
-        list_animation(_arms.bang, "anim_Bang")
-
-
-        //______________________________________________________________________________________________
-        const style = new PIXI.TextStyle({
-            fontFamily: 'Bahnschrift',
-            fontSize: 75,
-            fontWeight: 'bold',
-            // fontVariant: "small-caps",
-            fill: '#ffffff',
-            letterSpacing: 2,
-            // align: "center",
-
-
-            // fill: "white",
-            // // letterSpacing: 9,
-            // lineJoin: "bevel",
-            // stroke: "#4a4b7a",
-            // strokeThickness: 11,
-
-            // align:"left"
+        _app.ticker.add(() => {
+            _clip_mask.update(_app, _stage,
+                _arms.main,
+                _bang.getArmature(),
+                _stars);
         });
 
-        _arms.text = new PIXI.Text('х3112.52', style);
-        _arms.text.x = 218;
-        _arms.text.y = 100;
-
-        //______________________________________________________________________________________________
-
-        _stage.addChild(
-            _arms.room,
-            _arms.text,
-            _arms.ilon
-        )
-
-        _arms.mask_objs.init()
-
-        // const roket_place = PIXI.Sprite.from('roket_place.png');
-        // roket_place.anchor.set(0.5);
-        // roket_place.x = 500
-        // roket_place.y = 280
-
-        // PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
+        _forces.set_up_roket()
         _app.start();
         //____________________________
         start_anim(true)
 
-
-        var _app_runing = true
-        window.addEventListener(
-            "keydown", event => {
-                if (event.key === " ") {
-                    _app_runing = !_app_runing
-                    if (_app_runing)
-                        _app.start()
-                    else
-                        _app.stop()
-
-                    event.preventDefault();
-                }
-            }, false
-        );
-
-    }
-
-    function click_fun(armature, name_anim) {
-        console.log(name_anim, "______")
-        armature.visible = true;
-        armature.animation.play(name_anim)
-
-        // if (//armature == _arms.main &&
-        //     name_anim == ANIM_Main_scene.Start)
-        //     _arms.mask.animation.play(ANIM_Mask.Start);
     }
 
 
-    const _config = {
-        width: 840,//420,
-        height: 562,//281,
-    }
     var _app = null;
     var _stage = null;
-
-    // const stage = new PIXI.Container();
-    // const renderer = PIXI.autoDetectRenderer({
-    //     width: config.width,
-    //     height: config.height,
-    //     transparent: true
-    // })
-    // renderer.view.id = 'pixi_canvas'
-
-    var main_div = document.getElementById('canvas-container');
 
     this.init = () => {
 
@@ -1042,8 +558,8 @@ function Anim() {
             view: document.getElementById("canvas"),
             resolution: window.devicePixelRatio || 1,
             autoDensity: true,
-            width: _config.width,
-            height: _config.height
+            width: CANVAS_SIZE.width,
+            height: CANVAS_SIZE.height
             // transparent: true
         });
         _app.stop();
@@ -1084,6 +600,22 @@ function Anim() {
                     .decelerate()
 
             }
+
+            var _app_runing = true
+            window.addEventListener(
+                "keydown", event => {
+                    if (event.key === " ") {
+                        _app_runing = !_app_runing
+                        if (_app_runing)
+                            _app.start()
+                        else
+                            _app.stop()
+
+                        event.preventDefault();
+                    }
+                }, false
+            );
+
         } else {
             _app.stage.addChild(_stage = new PIXI.Container())
         }
@@ -1146,37 +678,24 @@ function Anim() {
         }
     }
 
-    //____resize
+
     window.addEventListener("resize", resizeThrottler, false);
     var resizeTimeout;
     function resizeThrottler() {
-        // ignore resize events as long as an actualResizeHandler execution is in the queue
         if (!resizeTimeout) {
             resizeTimeout = setTimeout(function () {
                 resizeTimeout = null;
                 onResizeWindow();
-
-                // The actualResizeHandler will execute at a rate of 15fps
             }, 66);
         }
     }
-    //____resize
 
     function onResizeWindow() {
-        // console.log(`${main_div.clientWidth} x ${main_div.clientHeight}`)
-
-        var _width = main_div.clientWidth
-        var _height = _width / _config.width * _config.height;
+        var _width = document.getElementById('canvas-container').clientWidth
+        var _height = _width / CANVAS_SIZE.width * CANVAS_SIZE.height;
 
         _app.renderer.resize(_width, _height)
-        // console.log('->' + _width + ' x ' + _height)
-
-        // _app.view.style.width = `${_app.view.width}px`
-        // app.view.width = _width
-
-        // _app.view.style.height = `${_app.view.height}px`
-        // app.view.height = _height
-        _stage.scale.set(_width / _config.width);
+        _stage.scale.set(_width / CANVAS_SIZE.width);
         _stage.x = 0
         _stage.y = 0
     }

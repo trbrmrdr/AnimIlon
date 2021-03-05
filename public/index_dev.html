@@ -1,0 +1,141 @@
+<head>
+    <style>
+        body,
+        html {
+            margin: 0px;
+            height: 100%;
+            /* overflow: hidden; */
+        }
+
+
+        canvas-container {
+            width: 100%;
+            height: 100%;
+
+            touch-action: none;
+            cursor: inherit;
+            display: block;
+        }
+
+        #canvas-container {
+            /* max-width: min(891px, 25vw); */
+            width: 40vw;
+        }
+
+        #events button {
+            display: block;
+        }
+
+        #stages,
+        .debug_btn {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script> -->
+
+    <script src="./lib/v6.0.0-rc.2/pixi.js"></script>
+
+    <script src="./lib/stats.js/build/stats.min.js"></script>
+    <script src="./lib/viewport/viewport.js"></script>
+
+    <!-- <script src="./lib/dragonBones.js" desc= "есть правки в исходниках"></script> -->
+    <!-- <script src="./lib/main.js"></script>  -->
+
+
+    <script src="./dist/main.js?v=10.26"></script>
+
+    <div id="stages" style="padding: 5px;
+    border: solid 2px green;
+    margin: 5px;">Очередь для сценки<br></div>
+
+
+    <div id="events" style="padding: 5px;
+    border: solid 2px rgb(155, 52, 214);
+    margin: 5px;"><br>События с input - Date.now()+сек.<br><button type="serve_checker" style="color: green;"
+            onclick="window.check_server(this)" checked>Сервер</input>
+            <br />
+
+    </div>
+
+
+    <div id="canvas-container"> <!--контейнер где лежит canvas с нужными размерами-->
+        <canvas id="canvas"></canvas> <!--сам canvas на котором рисуется анимашку-->
+    </div>
+
+    <div id="anim_ilon" class="debug_btn">Анимации Илона<br></div>
+    <div id="anim_button" class="debug_btn">Анимации Кнопки<br></div>
+    <div id="anim_roket" class="debug_btn">Анимации Рокеты<br></div>
+    <div id="anim_Bang" class="debug_btn">Взрыв<br></div>
+
+    <script>
+
+        window.onload = function () {
+            const _anim = new Anim().init()
+            // return
+            const _listener = new Listener(_anim).connectToServer('wss://ws.rocketcrash.vip/ws')
+
+
+            //Debug
+            if (true) {
+
+                var _is_server = true
+                window.check_server = (el) => {
+                    if (_is_server = !_is_server) {
+                        el.style.color = 'green'
+                        _listener.connect()
+                    } else {
+                        el.style.color = 'red'
+                        _listener.disconnect()
+                    }
+                }
+
+
+
+                const add_btn = (name, text, callback_btn, callback_in, val) => {
+                    const btn = document.createElement("button");
+                    btn.id = name
+                    val = val ? `value='${val}'` : ''
+                    if (callback_in) {
+                        btn.innerHTML = `${name}<input id="in_${name}" ${val} type="number" style="width:100px;" />${text}`;
+                    } else {
+                        btn.innerHTML = `${name} ${text}`;
+                    }
+                    btn.addEventListener("click", callback_btn);
+
+
+                    document.getElementById("events").appendChild(btn)
+                    if (callback_in)
+                        document.getElementById(`in_${name}`).addEventListener("input", callback_in);
+
+
+                }
+
+                var _var = {
+                    CREATED: 10,
+                    COMPLETED: 1.3,
+                    IN_PROGRESS: 0.0,
+                }
+
+
+
+                add_btn(LISTENER_STATUS.CREATED, " задежрка перед стартом с.",
+                    callback_btn = (el) => { _listener.us(el.target.id, Date.now() + _var[el.target.id] * 1000) },
+                    callback_in = (el) => { _var[el.target.parentElement.id] = Number.parseFloat(el.target.value) },
+                    _var.CREATED)
+
+
+                add_btn(LISTENER_STATUS.IN_PROGRESS, " поправка задержки в с.  ", callback_btn, callback_in, 0.0)
+
+                add_btn(LISTENER_STATUS.COMPLETED, "", callback_btn)
+            }
+        }
+
+    </script>
+
+
+
+
+</body>
