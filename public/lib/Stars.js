@@ -1,4 +1,4 @@
-
+// @todo Не хватает описания того, что происходит в контейнере человекопонятным языком
 function Stars(app) {
 
     var _container,
@@ -16,6 +16,8 @@ function Stars(app) {
         star_height = CANVAS_SIZE.height
 
 
+    // @todo 1500 +- сложных объектов с какими-то членами и методамии использоюмыми извне звучит очень тяжело для обработки.
+    // Если бы было описано поведение, может, придумали бы что-нибудь на стилях.
     const numStars = 1500;
     _container = new PIXI.Container()
 
@@ -27,12 +29,14 @@ function Stars(app) {
         tint: true
     });
 
+    // @todo Все ассеты нужно вынести в какой-нибудь реестр или синглотон, чтобы не плодить сущности.
     var fon = PIXI.Sprite.from('/data/10px_back.jpg')
     fon.scale.set(100)
     fon.x = 0
 
     _container.addChild(fon, particle_containter)
 
+    // @todo Аналогично
     const starTexture = PIXI.Texture.from('/data/star.png');
 
     for (var i = 0; i < numStars; i++) {
@@ -67,7 +71,10 @@ function Stars(app) {
         star.position.y -= Math.sign(fieldSpeed) * star_height;
     }
 
+    // @todo Переменная объявлена после использования
     const fieldSpeed = .3
+    
+    // @todo Очень похоже, что здесь на каждый тик происходит огромнейшее количество операций, учитывая кол-во "stars"
     app.ticker.add(function (delta) {
         if (!_star_is_work) return;
 

@@ -1,4 +1,6 @@
-
+/*
+Слишком много всего в одном файле
+ */
 function Anim() {
     var _btn = {};
 
@@ -20,6 +22,7 @@ function Anim() {
     }
 
     function _isActive(s_name, clear = true) {
+        // Надо отталкиваться от какого-то флага
         let ret = _btn[s_name].style.backgroundColor !== "";
         if (ret && clear) {
             setStage(s_name, false)
@@ -75,6 +78,7 @@ function Anim() {
         //     _arms.mask.animation.play(ANIM_Mask.Start);
     }
 
+    // @todo дебаг-тулзы нужно вынести во что-то отдельное и просто "подписать"
     const list_animation = (armature, id_cont) => {
         if (!HAS_DEBUG) return
         armature.animation._animationNames.forEach((animation_name) => {
@@ -175,6 +179,8 @@ function Anim() {
 
     var _has_timer = false
 
+    // Уже описал в файле аниации текста
+    // @todo дорого так обновлять стейт
     function text_idly_anim() {
         function loop() {
 
@@ -238,6 +244,7 @@ function Anim() {
     //переход на запуск сейчас
     var _forces = new (function () {
 
+        // @todo Что за магия
         var _timer_see_watch = Date.now() - 10000 ** 9
         var _show_see = null
 
@@ -690,6 +697,7 @@ function Anim() {
         }
     }
 
+    // @todo Лучше resizeObserver, он дешевле и везде у нас поддерживается
     function onResizeWindow() {
         var _width = document.getElementById('canvas-container').clientWidth
         var _height = _width / CANVAS_SIZE.width * CANVAS_SIZE.height;

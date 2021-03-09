@@ -1,8 +1,11 @@
+// @todo Лучше сделать через css, канвас менять дороже
+// Если остается канвас, шрифт надо подгружать в пикси
 function Tablo(main_anim) {
 
     var _text;
     const _anim = main_anim
 
+    // @todo Что такое f? Только из изучения кода далее я понимаю, что это фреймы для анимации ожидания раунда
     const f = [
         '',
         '.',
@@ -31,6 +34,7 @@ function Tablo(main_anim) {
 
     this.init = (container) => {
 
+        // @todo Не чистим память. 1/5
         const style = new PIXI.TextStyle({
             fontFamily: 'Bahnschrift',
             fontSize: 75,
@@ -40,6 +44,7 @@ function Tablo(main_anim) {
         });
 
 
+        // @todo Зачем нужна заглушка?
         _text = new PIXI.Text('х3112.52', style);
         _text.x = 218;
         _text.y = 100;

@@ -1,4 +1,6 @@
-
+/*
+@todo Разнести логику сокетов и updateState
+ */
 const LISTENER_STATUS = {
   CREATED: 'CREATED',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -18,6 +20,7 @@ function Listener(anim) {
     return _multiplier_in_server ? _multiplier_in_server : 2 ** (t / 1000 / 11);
   }
 
+  // Почему такая странная конструкция?
   var _tick = this.tick = () => {
     _elapsedTime = Math.max(0, Date.now() - _startTime)
     // _elapsedTime = 600; - стояло .......

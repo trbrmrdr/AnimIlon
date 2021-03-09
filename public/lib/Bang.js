@@ -1,3 +1,6 @@
+/*
+В контексте, что всё остаётся как есть, вроде, ок
+ */
 function Bang(factory_parsing_resources) {
 
 

@@ -1,3 +1,9 @@
+/*
+@todo Протупы неизбежны, надо подписываться на visibilitychange и менять стейт:
+не делать ничего вообще, если не активо и вывести из гибернации в актуальном состоянии при фокусе
+
+По коду ниже слонжо что-то сказать, мало что понятно
+ */
 function ClipMask(container, main_scene_armature) {
 
     var _rt_mask, _rt_roket_zone, _mask_armature;

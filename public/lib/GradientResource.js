@@ -1,3 +1,6 @@
+/*
+Не используется
+ */
 class GradientResource extends PIXI.Resource {
     constructor() {
         // pass width and height. (0,0) if we dont know yet

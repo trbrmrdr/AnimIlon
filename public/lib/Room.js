@@ -6,12 +6,19 @@ function Room(main_anim) {
     const _anim = main_anim
 
     this.setUp = () => {
+        // @todo Лучше через optional chaining:
+        // [].includes(_button_armature.animation.lastAnimationState?.name)
         if (_button_armature.animation.lastAnimationState &&
             [
+                // @todo Не шибко объясняет, какое поведение содержит
+                // Что-то вроде roomButtonAnimation.waitOnState
                 ANIM_Button.Wait_On,
                 ANIM_Button.Wait_On_Idly,
                 ANIM_Button.Wait_static
             ].includes(_button_armature.animation.lastAnimationState.name)
+        // @todo Не экономь на {
+        //
+        // }
         ) return false;
 
         _setState(ANIM_Room.Wait)
@@ -28,7 +35,9 @@ function Room(main_anim) {
     function _setState(state, is_safe) {
         if (is_safe && !_anim.hasConnected()) return
         const factory = dragonBones.PixiFactory.factory;
+        // @todo Button, не knopka
         let knopka_slot = _button_armature.armature.getSlot("knopka_off");
+        // @todo Не похоже, что тут нужен switch
         switch (state) {
             case ANIM_Room.Stop:
                 if (_has_win) {

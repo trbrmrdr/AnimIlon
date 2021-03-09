@@ -1,14 +1,19 @@
-
+/*
+В общем по файлу и его исопльзованиях - разнести бы по подфайликам.
+@todo И самое главное - нейминг.
+ */
 const HAS_DEBUG = false
 const HAS_STATS = false
 
 const DELAY_PRESSED_BTN = 920
+
 
 const ANIM_Bang = {
     Bang: "взрыв",
     Loop: "цикл",
     Out: "выход"
 }
+
 const ANIM_Ilon = {
     Wait: "10_wait_(idle)",
     Wait_sbtn: "10_wait_(see_button)",
