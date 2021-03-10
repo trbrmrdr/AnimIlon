@@ -83,7 +83,7 @@ function Anim() {
 
     // @todo дебаг-тулзы нужно вынести во что-то отдельное и просто "подписать"
     const list_animation = (armature, id_cont) => {
-        if (!HAS_DEBUG) return
+        if (!window.HAS_DEBUG) return
         armature.animation._animationNames.forEach((animation_name) => {
             var btn = document.createElement("button");
             btn.innerHTML = animation_name;
@@ -101,7 +101,7 @@ function Anim() {
                 btn.innerHTML = name;
                 // btn.style.opacity = enabled ? 1 : 0.4;
                 btn.addEventListener("click", () => { __debug_select_stage(name) });
-                if (HAS_DEBUG) {
+                if (window.HAS_DEBUG) {
                     document.getElementById("stages").appendChild(btn);
                 }
             }
@@ -586,7 +586,7 @@ function Anim() {
             // transparent: true
         });
 
-        if (HAS_DEBUG) {
+        if (window.HAS_DEBUG) {
             if (false) {
                 app.stage.addChild(main_view = new PIXI.Container());
 
@@ -652,7 +652,7 @@ function Anim() {
             .load(_onAssetsLoaded);
 
 
-        if (HAS_STATS) {
+        if (window.HAS_STATS) {
             var stats = new Stats();
             stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 

@@ -2,8 +2,8 @@
 В общем по файлу и его исопльзованиях - разнести бы по подфайликам.
 @todo И самое главное - нейминг.
  */
-const HAS_DEBUG = false
-const HAS_STATS = false
+window.HAS_DEBUG = false
+window.HAS_STATS = false
 
 const DELAY_PRESSED_BTN = 920
 

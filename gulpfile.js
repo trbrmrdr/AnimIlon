@@ -105,7 +105,7 @@ gulp.task('release_src', function () {
     ])
 
         // .pipe(javascriptObfuscator())
-        .pipe(uglify())
+        // .pipe(uglify())
 
         .pipe(concat('main.js'))
         .pipe(gulp.dest('./public/dist/'))
