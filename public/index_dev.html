@@ -19,17 +19,14 @@
 
         #canvas-container {
             /* max-width: min(891px, 25vw); */
-            width: 40vw;
+            width: 90vw;
         }
 
         #events button {
             display: block;
         }
 
-        #stages,
-        .debug_btn {
-            display: none;
-        }
+
     </style>
 </head>
 
@@ -45,7 +42,7 @@
     <!-- <script src="./lib/main.js"></script>  -->
 
 
-    <script src="./dist/main.js?v=10.26"></script>
+    <script src="./dist/main.js"></script>
 
     <div id="stages" style="padding: 5px;
     border: solid 2px green;
@@ -54,15 +51,21 @@
 
     <div id="events" style="padding: 5px;
     border: solid 2px rgb(155, 52, 214);
-    margin: 5px;"><br>События с input - Date.now()+сек.<br><button type="serve_checker" style="color: green;"
-            onclick="window.check_server(this)" checked>Сервер</input>
-            <br />
+    margin: 5px;"><br>События с input - Date.now()+сек.
+
+        <br><button onclick="window.destory(this)" checked>Destroy</button>
+
+        <br><button type="serve_checker" style="color: green;" onclick="window.check_server(this)"
+            checked>Сервер</button>
+        <br />
 
     </div>
 
 
-    <div id="canvas-container"> <!--контейнер где лежит canvas с нужными размерами-->
-        <canvas id="canvas"></canvas> <!--сам canvas на котором рисуется анимашку-->
+    <div id="canvas-container">
+        <!--контейнер где лежит canvas с нужными размерами-->
+        <canvas id="canvas"></canvas>
+        <!--сам canvas на котором рисуется анимашку-->
     </div>
 
     <div id="anim_ilon" class="debug_btn">Анимации Илона<br></div>
@@ -72,11 +75,30 @@
 
     <script>
 
+        var is_inited = false
+
         window.onload = function () {
+            init_anim()
+        }
+
+        window.destory = (btn) => {
+            if (is_inited) {
+                btn.innerHTML = "Create"
+                window.anim.destroy()
+                is_inited = false
+            } else {
+                btn.innerHTML = "Destory"
+                init_anim()
+            }
+        }
+
+
+        function init_anim() {
+            is_inited = true
             const _anim = new Anim().init()
+            window.anim = _anim
             // return
             const _listener = new Listener(_anim).connectToServer('wss://ws.rocketcrash.vip/ws')
-
 
             //Debug
             if (true) {
@@ -95,7 +117,12 @@
 
 
                 const add_btn = (name, text, callback_btn, callback_in, val) => {
-                    const btn = document.createElement("button");
+                    let btn = document.getElementById(name)
+                    if (btn) {
+                        btn.parentNode.removeChild(btn);
+                    }
+
+                    btn = document.createElement("button");
                     btn.id = name
                     val = val ? `value='${val}'` : ''
                     if (callback_in) {
@@ -131,8 +158,8 @@
 
                 add_btn(LISTENER_STATUS.COMPLETED, "", callback_btn)
             }
-        }
 
+        }
     </script>
 
 

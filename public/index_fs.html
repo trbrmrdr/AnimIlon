@@ -6,7 +6,9 @@
             height: 100%;
         }
         #canvas-container {
-            width: 40vw;
+            width: 100vw;
+            touch-action: none;
+            cursor: inherit;
         }
     </style>
 </head>
@@ -14,7 +16,7 @@
 <body>
 
     <script src="./lib/v6.0.0-rc.2/pixi.js"></script>
-    <script src="./dist/main.js?v=2.2"></script>
+    <script src="./dist/main.js?v=2.3"></script>
 
     <div id="canvas-container">
         <canvas id="canvas"></canvas>

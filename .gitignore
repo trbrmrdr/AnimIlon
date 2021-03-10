@@ -67,3 +67,6 @@ node_modules/
 
 node_modules
 public/dist/
+
+public/lib/GradientResource.js
+public/lib/helper.js

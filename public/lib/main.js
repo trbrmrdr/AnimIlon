@@ -2,28 +2,31 @@
 Слишком много всего в одном файле
  */
 function Anim() {
-    var _btn = {};
+    var btn_stages;
 
+    function isLoaded() { return btn_stages !== undefined }
     // работали как кнопки с переходом на событие
     // теперь просто включатели события
     // завязаны на предыдущие события - будут работать только поочердёно
     function setStage(s_name, active = true) {
         try {
-            _btn[s_name].style.backgroundColor = active ? "#86da86" : "";
+            btn_stages[s_name].style.backgroundColor = active ? "#86da86" : "";
         } catch (ex) {
             console.log(`active ${s_name}`)
         }
     }
     function clearStage() {
-        Object.entries(_btn).forEach((el) => {
+        Object.entries(btn_stages).forEach((el) => {
             el[1].style.backgroundColor = "";
             // el[1].style.opacity = 0.4;`
         })
     }
 
     function _isActive(s_name, clear = true) {
+        if (!btn_stages) return;
+
         // Надо отталкиваться от какого-то флага
-        let ret = _btn[s_name].style.backgroundColor !== "";
+        let ret = btn_stages[s_name].style.backgroundColor !== "";
         if (ret && clear) {
             setStage(s_name, false)
         }
@@ -32,7 +35,7 @@ function Anim() {
     this.isActive = _isActive
 
     function __debug_select_stage(s_name) {
-        if (_btn[s_name].style.opacity < 1.) return;
+        if (btn_stages[s_name].style.opacity < 1.) return;
         switch (s_name) {
             case STAGE_NAMES.Start:
                 start_anim();
@@ -92,8 +95,9 @@ function Anim() {
 
     function start_anim(init = false) {
         if (init) {
+            btn_stages = {}
             const add_btn = (name, enabled = false) => {
-                const btn = _btn[name] = document.createElement("button");
+                const btn = btn_stages[name] = document.createElement("button");
                 btn.innerHTML = name;
                 // btn.style.opacity = enabled ? 1 : 0.4;
                 btn.addEventListener("click", () => { __debug_select_stage(name) });
@@ -128,8 +132,11 @@ function Anim() {
     this.hasConnected = () => {
         return _time_to_start > 0
     }
+    /** методы для listener */
 
     this.start_after = (_delay_ms) => {
+        if (!isLoaded()) return
+
         text_idly_anim()
 
         let _delay_to_start = Math.max(DELAY_PRESSED_BTN, _delay_ms - DELAY_PRESSED_BTN)
@@ -162,20 +169,27 @@ function Anim() {
     }
 
     this.in_process = () => {
-        _room.setState(ANIM_Room.Work, true)
+        if (!isLoaded()) return
+
+        room.setState(ANIM_Room.Work, true)
         _forces.PressBtn(true)
     }
 
     this.completed = () => {
-        _room.setState(ANIM_Room.Stop, true)
+        if (!isLoaded()) return
+
+        room.setState(ANIM_Room.Stop, true)
         setStage(STAGE_NAMES.End_wait)
         _forces.Exploded(true)
     }
 
     this.set_win = (has_win) => {
+        if (!isLoaded()) return
+
         if (has_win)
-            _room.setState(ANIM_Room.Win, true)
+            room.setState(ANIM_Room.Win, true)
     }
+    /* ################################# */
 
     var _has_timer = false
 
@@ -186,7 +200,7 @@ function Anim() {
 
             _has_timer = _time_to_start + _time_press > 0
             if (_has_timer) {
-                _room.setState(ANIM_Room.Wait)
+                room.setState(ANIM_Room.Wait)
 
                 let now = Date.now()
                 let left = _del_to_pressed
@@ -199,7 +213,7 @@ function Anim() {
                     // console.log(elapsed / 1000)
                     left += elapsed
                 }
-                _tablo.setLeftTime(left)
+                tablo.setLeftTime(left)
             }
 
             setTimeout(loop, 50);
@@ -209,7 +223,7 @@ function Anim() {
 
 
     this.setMultiplier = (tick, multip) => {
-        _app.ticker.add(() => {
+        app.ticker.add(() => {
 
             if (_has_timer) return
 
@@ -229,13 +243,13 @@ function Anim() {
                     // _forces.TwoHand()
                 }
             } else {
-                _tablo.updateIdly()
+                tablo.updateIdly()
                 return
             }
 
             out_multip = Math.min(out_multip, MAX_MULTIP)
 
-            _tablo.setMultiplier(out_multip)
+            tablo.setMultiplier(out_multip)
 
         });
     }
@@ -244,7 +258,8 @@ function Anim() {
     //переход на запуск сейчас
     var _forces = new (function () {
 
-        // @todo Что за магия
+        // @todo Что за магия 
+        // время последнего смотра на часы - для старта записываем что смотрели оооочень давно (** - степень)
         var _timer_see_watch = Date.now() - 10000 ** 9
         var _show_see = null
 
@@ -272,13 +287,13 @@ function Anim() {
         }
 
         this.hide_bang = () => {
-            if (_bang.Hide()) {
+            if (bang.Hide()) {
                 _arms.main.animation.play(ANIM_Main_scene.Reload);
             }
         }
 
         this.set_up_button = () => {
-            if (!_room.setUp()) return
+            if (!room.setUp()) return
 
             _timer_see_watch = Date.now()
             // Илон ещё выходит из грусной эмойии
@@ -312,7 +327,7 @@ function Anim() {
             //начало старта
             if (_handle_started_roket) clearTimeout(_handle_started_roket)
             _handle_started_roket = setTimeout(() => {
-                _room.setState(ANIM_Room.Work)
+                room.setState(ANIM_Room.Work)
                 _main_scene_is_started = true
                 _arms.main.animation.play(ANIM_Main_scene.Start);
                 _type_start = 3
@@ -332,7 +347,7 @@ function Anim() {
         this.RoketTakes = () => {
             _type_start = 1
             _arms.ilon.animation.play(ANIM_Ilon.RocketTakes_Start);
-            _room.Off()
+            room.Off()
         }
 
         this.TwoHand = () => {
@@ -354,10 +369,10 @@ function Anim() {
             if (safe) {
                 if (_main_scene_is_started) {
                     _arms.main.animation.play(ANIM_Main_scene.Wait);
-                    _bang.toLoop()
+                    bang.toLoop()
                 } else {
-                    _bang.toBang()
-                    
+                    bang.toBang()
+
                 }
             }
 
@@ -417,7 +432,7 @@ function Anim() {
                 PIXI.Ticker.shared.speed = 1;
                 // if (event.animationState.name !== ANIM_Ilon.Press_Button_Wait)
                 _arms.ilon.animation.play(ANIM_Ilon.Press_Button_Wait);
-                _room.Off()
+                room.Off()
                 break;
 
             case ANIM_Ilon.RocketTakes_Start:
@@ -477,12 +492,12 @@ function Anim() {
         _main_scene_is_started = false;
         switch (event.animationState.name) {
             case ANIM_Main_scene.Reload:
-                _stars.setEnable(false)
+                stars.setEnable(false)
                 _arms.main.animation.play(ANIM_Main_scene.Wait);
                 break;
             case ANIM_Main_scene.Start:
                 _arms.main.animation.play(ANIM_Main_scene.Fly);
-                _stars.setEnable(true)
+                stars.setEnable(true)
                 break
             case ANIM_Main_scene.Fly:
                 _arms.main.animation.play(ANIM_Main_scene.Fly_circle);
@@ -500,9 +515,9 @@ function Anim() {
         lon: null,
     };
 
-    var _stars, _clip_mask,_bang;
-    var _room = new Room(this)
-    var _tablo = new Tablo(this)
+    var stars, clip_mask, bang;
+    var room = new Room(this)
+    var tablo = new Tablo(this)
 
     function _onAssetsLoaded(loader, res) {
 
@@ -518,7 +533,7 @@ function Anim() {
         list_animation(_arms.ilon, "anim_ilon")
 
         //______________________________________________________________________________________________
-        _room.init(pf_parsed, _stage, _arms.ilon)
+        room.init(pf_parsed, main_view, _arms.ilon)
         //______________________________________________________________________________________________
 
         _arms.main = pf_parsed.buildArmatureDisplay('Main_scene');
@@ -527,80 +542,80 @@ function Anim() {
         list_animation(_arms.main, "anim_roket")
         //______________________________________________________________________________________________
 
-        _bang = new Bang(pf_parsed)
+        bang = new Bang(pf_parsed)
 
         //_____________________________________________________________________________________________
-        _tablo.init(_stage)
+        tablo.init(main_view)
 
         //______________________________________________________________________________________________
-        _stage.addChild(_arms.ilon)
+        main_view.addChild(_arms.ilon)
 
-        _stars = new Stars(_app)
+        stars = new Stars(app)
 
         //в проекте управление маской происходит - в коде ест ьпротупы если проект неактивен!!!!!!!!!!!!
-        _clip_mask = new ClipMask(_stage, _arms.main)
+        clip_mask = new ClipMask(main_view, _arms.main)
 
-        _app.ticker.add(() => {
-            _clip_mask.update(_app, _stage,
+        app.ticker.add(() => {
+            clip_mask.update(app, main_view,
                 _arms.main,
-                _bang.getArmature(),
-                _stars);
+                bang.getArmature(),
+                stars);
         });
 
         _forces.set_up_roket()
-        _app.start();
+        app.start();
         //____________________________
         start_anim(true)
 
     }
 
 
-    var _app = null;
-    var _stage = null;
+    var app = null;
+    var main_view = null;
 
     this.init = () => {
 
-        _app = new PIXI.Application({
+        app = new PIXI.Application({
             antialias: true,
             view: document.getElementById("canvas"),
             resolution: window.devicePixelRatio || 1,
             autoDensity: true,
             width: CANVAS_SIZE.width,
-            height: CANVAS_SIZE.height
+            height: CANVAS_SIZE.height,
+            autoStart: false,
             // transparent: true
         });
-        _app.stop();
 
         if (HAS_DEBUG) {
             if (false) {
-                _app.stage.addChild(_stage = new PIXI.Container());
+                app.stage.addChild(main_view = new PIXI.Container());
 
-                _stage.interactive = true;
-                _stage.buttonMode = true;
-                _stage
+                main_view.interactive = true;
+                main_view.buttonMode = true;
+                main_view
                     .on('pointerdown', onDragStart)
                     .on('pointerup', onDragEnd)
                     .on('pointerupoutside', onDragEnd)
                     .on('pointermove', onDragMove);
             } else {
                 // create viewport
-                _stage = new Viewport.Viewport({
+                main_view = new Viewport.Viewport({
                     screenWidth: window.innerWidth,
                     screenHeight: window.innerHeight,
                     worldWidth: 1000,
                     worldHeight: 1000,
 
-                    interaction: _app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+                    interaction: app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
                 })
 
-                _stage
+                main_view
                     .on('pointerdown', onDragStart)
                     .on('pointerup', onDragEnd)
                 // add the viewport to the stage
-                _app.stage.addChild(_stage)
+                app.stage.addChild(main_view)
 
                 // activate plugins
-                _stage
+                main_view
                     .drag()
                     .pinch()
                     .wheel()
@@ -614,9 +629,9 @@ function Anim() {
                     if (event.key === " ") {
                         _app_runing = !_app_runing
                         if (_app_runing)
-                            _app.start()
+                            app.start()
                         else
-                            _app.stop()
+                            app.stop()
 
                         event.preventDefault();
                     }
@@ -624,16 +639,16 @@ function Anim() {
             );
 
         } else {
-            _app.stage.addChild(_stage = new PIXI.Container())
+            app.stage.addChild(main_view = new PIXI.Container())
         }
 
         onResizeWindow()
 
 
         PIXI.Loader.shared
-            .add('skeleton', '/data/Ilon_ske.json')
-            .add('texture_json', '/data/Ilon_tex.json')
-            .add('texture_png', '/data/Ilon_tex.png')
+            .add('skeleton', ASSETS.anim_ske)
+            .add('texture_json', ASSETS.atlas_json)
+            .add('texture_png', ASSETS.atlas_png)
             .load(_onAssetsLoaded);
 
 
@@ -641,14 +656,23 @@ function Anim() {
             var stats = new Stats();
             stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 
-            stats.dom.style.left = "480px";
+            stats.dom.style.left = '480px';
             document.body.appendChild(stats.dom)
-            _app.ticker.add(() => {
+            app.ticker.add(() => {
                 stats.update();
             });
         }
 
         return this;
+    }
+
+    this.destroy = () => {
+        /* while (app.stage.children[0]) {
+            app.stage.removeChild(app.stage.children[0])
+            spr.destroy({children: true, texture: true, baseTexture: false});
+        } */
+
+        app.destroy()
     }
 
 
@@ -686,7 +710,12 @@ function Anim() {
     }
 
 
-    window.addEventListener("resize", resizeThrottler, false);
+    const canvas_container = document.getElementById('canvas-container')
+    const ro = new ResizeObserver(entries => {
+        resizeThrottler(entries.target)
+    });
+    ro.observe(canvas_container);
+
     var resizeTimeout;
     function resizeThrottler() {
         if (!resizeTimeout) {
@@ -697,15 +726,16 @@ function Anim() {
         }
     }
 
-    // @todo Лучше resizeObserver, он дешевле и везде у нас поддерживается
     function onResizeWindow() {
-        var _width = document.getElementById('canvas-container').clientWidth
-        var _height = _width / CANVAS_SIZE.width * CANVAS_SIZE.height;
+        const new_width = canvas_container.clientWidth
+        const new_height = new_width / CANVAS_SIZE.width * CANVAS_SIZE.height;
 
-        _app.renderer.resize(_width, _height)
-        _stage.scale.set(_width / CANVAS_SIZE.width);
-        _stage.x = 0
-        _stage.y = 0
+        app.renderer.resize(new_width, new_height)
+        main_view.scale.set(new_width / CANVAS_SIZE.width);
+        main_view.x = 0
+        main_view.y = 0
     }
+
+
     return this;
 };

@@ -1,67 +1,67 @@
-function Room(main_anim) {
+function Room(anim) {
 
 
-    var _has_win = false;
-    var _room_armature, _button_armature;
-    const _anim = main_anim
+    var is_win = false;
+    var room_armature, button_armature;
+    const main_anim = anim
 
     this.setUp = () => {
         // @todo Лучше через optional chaining:
         // [].includes(_button_armature.animation.lastAnimationState?.name)
-        if (_button_armature.animation.lastAnimationState &&
+        if (button_armature.animation.lastAnimationState &&
             [
                 // @todo Не шибко объясняет, какое поведение содержит
                 // Что-то вроде roomButtonAnimation.waitOnState
                 ANIM_Button.Wait_On,
                 ANIM_Button.Wait_On_Idly,
                 ANIM_Button.Wait_static
-            ].includes(_button_armature.animation.lastAnimationState.name)
-        // @todo Не экономь на {
-        //
-        // }
-        ) return false;
+            ].includes(button_armature.animation.lastAnimationState.name)
+        ) {
+            return false;
+        }
 
         _setState(ANIM_Room.Wait)
-        _button_armature.animation.play(ANIM_Button.Reload);
+        button_armature.animation.play(ANIM_Button.Reload);
         return true;
     }
 
 
     this.Off = () => {
         // _button_armature.visible = true
-        _button_armature.animation.play(ANIM_Button.Wait_Off);
+        button_armature.animation.play(ANIM_Button.Wait_Off);
     }
 
     function _setState(state, is_safe) {
-        if (is_safe && !_anim.hasConnected()) return
+        if (!button_armature) return
+        if (is_safe && !main_anim.hasConnected()) return
         const factory = dragonBones.PixiFactory.factory;
         // @todo Button, не knopka
-        let knopka_slot = _button_armature.armature.getSlot("knopka_off");
+        let knopka_slot = button_armature.armature.getSlot("knopka_off");
         // @todo Не похоже, что тут нужен switch
         switch (state) {
             case ANIM_Room.Stop:
-                if (_has_win) {
-                    _has_win = false
+                if (is_win) {
+                    is_win = false
                     break
                 }
 
-                _room_armature.animation.play(ANIM_Room.Stop)
+                room_armature.animation.play(ANIM_Room.Stop)
                 factory.replaceSlotDisplay("", "Button_state", "button", "stop", knopka_slot);
                 break;
             case ANIM_Room.Work:
-                if (_has_win) break
-                _room_armature.animation.play(ANIM_Room.Work)
+                if (is_win) break
+                room_armature.animation.play(ANIM_Room.Work)
                 factory.replaceSlotDisplay("", "Button_state", "button", "work", knopka_slot);
                 break;
             case ANIM_Room.Wait:
-                _has_win = false
-                _room_armature.animation.play(ANIM_Room.Wait)
+                is_win = false
+                room_armature.animation.play(ANIM_Room.Wait)
                 factory.replaceSlotDisplay("", "Button_state", "button", "wait", knopka_slot);
                 break;
             case ANIM_Room.Win:
-                _has_win = true;
+                is_win = true;
 
-                _room_armature.animation.play(ANIM_Room.Win)
+                room_armature.animation.play(ANIM_Room.Win)
                 factory.replaceSlotDisplay("", "Button_state", "button", "win", knopka_slot);
                 break;
         }
@@ -73,18 +73,18 @@ function Room(main_anim) {
         // console.log(event)
         switch (event.animationState.name) {
             case ANIM_Button.Reload:
-                _button_armature.animation.play(ANIM_Button.Wait_On_Idly);
+                button_armature.animation.play(ANIM_Button.Wait_On_Idly);
                 break;
             case ANIM_Button.Wait_On:
             case ANIM_Button.Wait_On_Idly:
-                if (_anim.isActive(STAGE_NAMES.PressBtn, false)) {
+                if (main_anim.isActive(STAGE_NAMES.PressBtn, false)) {
                     // _button_armature.animation.play(ANIM_Button.Wait_static);
                     break;
                 }
                 if (event.animationState.name !== ANIM_Button.Wait_On_Idly)
-                    _button_armature.animation.play(ANIM_Button.Wait_On_Idly);
+                    button_armature.animation.play(ANIM_Button.Wait_On_Idly);
                 else
-                    _button_armature.animation.play(ANIM_Button.Wait_On);
+                    button_armature.animation.play(ANIM_Button.Wait_On);
                 break;
             // case ANIM_Button.Press:
             case ANIM_Button.Wait_Off:
@@ -94,21 +94,21 @@ function Room(main_anim) {
     }
 
     this.init = (factory_parsing_resources, container, ilon_armature) => {
-        _room_armature = factory_parsing_resources.buildArmatureDisplay('Room');
-        SetPos(_room_armature)
+        room_armature = factory_parsing_resources.buildArmatureDisplay('Room');
+        SetPos(room_armature)
 
-        container.addChild(_room_armature)
+        container.addChild(room_armature)
 
         //кнопки
         ilon_armature.children.forEach((el) => {
-            if (_button_armature) return
+            if (button_armature) return
             if (el instanceof dragonBones.PixiArmatureDisplay) {
                 if (el.armature.name == "Button") {
-                    _button_armature = el
+                    button_armature = el
                 }
             }
         })
-        _button_armature.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿button, this);
+        button_armature.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿button, this);
         // list_animation(_button_armature, "anim_button")
 
 

@@ -8,8 +8,7 @@ const LISTENER_STATUS = {
 }
 
 function Listener(anim) {
-  var _anim = anim
-  var duration = 1600;
+  var main_anim = anim
 
   var _startTime = null,
     _multiplier = 1,
@@ -32,7 +31,7 @@ function Listener(anim) {
 
   this.multiplier = () => { return _multiplier; }
 
-  _anim.setMultiplier(this.tick, this.multiplier)
+  main_anim.setMultiplier(this.tick, this.multiplier)
 
   var _user_id = -1
   var updateState = this.us = (status, date, multiplier_to_show) => {
@@ -44,18 +43,18 @@ function Listener(anim) {
       case LISTENER_STATUS.CREATED:
         _startTime = date || Date.now()
         _tick();
-        _anim.start_after(_startTime - Date.now())
+        main_anim.start_after(_startTime - Date.now())
         break;
       case LISTENER_STATUS.IN_PROGRESS:
         _startTime = date || _startTime || Date.now();
         _tick();
-        _anim.in_process()
+        main_anim.in_process()
         break;
       case LISTENER_STATUS.COMPLETED:
         _user_id = -1
         // date - общее время игры
         _tick()
-        _anim.completed()
+        main_anim.completed()
         break;
     }
   }
@@ -132,14 +131,14 @@ function Listener(anim) {
             );
             break;
           case 'playerUpdate':
-            // console.log(message.payload)
+            console.log(message.payload)
             if (_user_id == -1) {
               _user_id = message.payload.player.user_id
             }
             // let tlog = ''
             if (_user_id == message.payload.player.user_id) {
               // tlog += '\n\tlistener ->' + message.payload.player.out_at_multiplier
-              _anim.set_win(message.payload.player.out_at_multiplier > 1.0)
+              main_anim.set_win(message.payload.player.out_at_multiplier > 1.0)
             }
             // console.log(message.payload.player.user_id + " ->" + message.payload.player.out_at_multiplier + tlog)
             break;

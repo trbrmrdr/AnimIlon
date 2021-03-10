@@ -6,7 +6,7 @@
  */
 function ClipMask(container, main_scene_armature) {
 
-    var _rt_mask, _rt_roket_zone, _mask_armature;
+    var mask_armature;
 
     this.update = (
         app, container,
@@ -14,20 +14,20 @@ function ClipMask(container, main_scene_armature) {
         bang_armature,
         stars) => {
 
-        SetPos(_mask_armature)
+        SetPos(mask_armature)
 
-        container.setChildIndex(_rt_mask.sprite, container.children.length - 1)
-        app.renderer.render(_mask_armature, _rt_mask.rt);
+        container.setChildIndex(rt_mask.sprite, container.children.length - 1)
+        app.renderer.render(mask_armature, rt_mask.rt);
 
-        container.setChildIndex(_rt_roket_zone.sprite, container.children.length - 1)
+        container.setChildIndex(rt_roket_zone.sprite, container.children.length - 1)
 
-        app.renderer.render(stars.getContainer(), _rt_roket_zone.rt);
-        app.renderer.render(main_scene_armature, _rt_roket_zone.rt, false);
-        app.renderer.render(bang_armature, _rt_roket_zone.rt, false);
+        app.renderer.render(stars.getContainer(), rt_roket_zone.rt);
+        app.renderer.render(main_scene_armature, rt_roket_zone.rt, false);
+        app.renderer.render(bang_armature, rt_roket_zone.rt, false);
 
         // _arms.main.mask = rt_mask.s
         // _arms.bang.mask = rt_mask.s
-        _rt_roket_zone.sprite.mask = _rt_mask.sprite
+        rt_roket_zone.sprite.mask = rt_mask.sprite
 
         // console.log(_arms.main.animation);
     }
@@ -47,21 +47,21 @@ function ClipMask(container, main_scene_armature) {
 
 
     main_scene_armature.children.forEach((el) => {
-        if (_mask_armature) return
+        if (mask_armature) return
         if (el instanceof dragonBones.PixiArmatureDisplay) {
             if (el.armature.name == "Mask") {
-                _mask_armature = el
+                mask_armature = el
             }
         }
     })
 
 
-    _rt_mask = create_rt()
-    _rt_roket_zone = create_rt()
+    const rt_mask = create_rt()
+    const rt_roket_zone = create_rt()
 
     container.addChild(
-        _rt_mask.sprite,
-        _rt_roket_zone.sprite
+        rt_mask.sprite,
+        rt_roket_zone.sprite
         // createStar(),
         // _arms.main,
         // _arms.bang,

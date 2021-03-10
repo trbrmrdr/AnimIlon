@@ -1,12 +1,12 @@
 // @todo Лучше сделать через css, канвас менять дороже
 // Если остается канвас, шрифт надо подгружать в пикси
-function Tablo(main_anim) {
+function Tablo(anim) {
 
-    var _text;
-    const _anim = main_anim
+    var text_view;
+    const main_anim = anim
 
-    // @todo Что такое f? Только из изучения кода далее я понимаю, что это фреймы для анимации ожидания раунда
-    const f = [
+    //фраймы для самой первой анимации ожидания - перед подключением к соккету frame in idly
+    const fii = [
         '',
         '.',
         '..',
@@ -19,17 +19,17 @@ function Tablo(main_anim) {
     ];
 
     this.updateIdly = () => {
-        if (_anim.hasConnected()) return
+        if (main_anim.hasConnected()) return
 
-        _text.text = f[Math.floor((Date.now() / 100) % f.length)];
+        text_view.text = fii[Math.floor((Date.now() / 100) % fii.length)];
     }
 
     this.setLeftTime = (msec) => {
-        _text.text = `${(msec / 1000).toFixed(2)}sec`
+        text_view.text = `${(msec / 1000).toFixed(2)}sec`
     }
 
     this.setMultiplier = (multiplier) => {
-        _text.text = `x${multiplier.toFixed(2)}`
+        text_view.text = `x${multiplier.toFixed(2)}`
     }
 
     this.init = (container) => {
@@ -45,11 +45,11 @@ function Tablo(main_anim) {
 
 
         // @todo Зачем нужна заглушка?
-        _text = new PIXI.Text('х3112.52', style);
-        _text.x = 218;
-        _text.y = 100;
+        text_view = new PIXI.Text('х3112.52', style);
+        text_view.x = 218;
+        text_view.y = 100;
 
-        container.addChild(_text)
+        container.addChild(text_view)
     }
 
     return this

@@ -21,6 +21,10 @@ gulp.task('scripts', function () {
         "./public/lib/dragonBones.js",
         // "./lib/GradientResource.js",
         // "./lib/helper.js",
+
+        "./public/lib/Const.js",
+        "./public/lib/Assets.js",
+
         "./public/lib/listener.js",
 
         "./public/lib/Stars.js",
@@ -28,9 +32,6 @@ gulp.task('scripts', function () {
         "./public/lib/Room.js",
         "./public/lib/Tablo.js",
         "./public/lib/Bang.js",
-
-
-        "./public/lib/const.js",
 
         "./public/lib/main.js"
         
@@ -42,7 +43,7 @@ gulp.task('scripts', function () {
         // .pipe(browserify())
 
         // .pipe(javascriptObfuscator())
-        .pipe(uglify())
+        // .pipe(uglify())
 
         .pipe(concat('main.js')) // в какой файл объединить
         .pipe(gulp.dest('./public/dist/'))
@@ -91,7 +92,8 @@ gulp.task('release_src', function () {
         "./public/lib/dragonBones.js",
         "./public/lib/listener.js",
 
-        "./public/lib/const.js",
+        "./public/lib/Const.js",
+        "./public/lib/Assets.js",
 
         "./public/lib/Stars.js",
         "./public/lib/ClipMask.js",
