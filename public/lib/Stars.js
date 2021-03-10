@@ -7,13 +7,20 @@ function Stars(app) {
         numStars = 400;
 
     var is_work = false
-
+    const fieldSpeed = .3
 
     this.getContainer = () => { return container; }
 
     this.setEnable = (enable) => {
         is_work = enable
     }
+
+    // @todo Все ассеты нужно вынести в какой-нибудь реестр или синглотон, чтобы не плодить сущности.
+    const fon = PIXI.Sprite.from(ASSETS.black_back)
+    fon.scale.set(100)
+    fon.x = 0
+
+    container.addChild(fon)
 
     const particle_containter = new PIXI.ParticleContainer(numStars, {
         vertices: true,
@@ -22,18 +29,10 @@ function Stars(app) {
         uvs: false,
         tint: true
     });
-
-    // @todo Все ассеты нужно вынести в какой-нибудь реестр или синглотон, чтобы не плодить сущности.
-    const fon = PIXI.Sprite.from(ASSETS.black_back)
-    fon.scale.set(100)
-    fon.x = 0
-
-    container.addChild(fon, particle_containter)
+    container.addChild(particle_containter)
     particle_containter.x = CANVAS_SIZE.width - star_width
 
     const starTexture = PIXI.Texture.from(ASSETS.star);
-    // @todo Переменная объявлена после использования
-    const fieldSpeed = .3
 
     for (var i = 0; i < numStars; i++) {
         // const starTexture = PIXI.Texture.from(`/data/stars/s__(${1 + Math.round(Math.random() * 140)}).png`);

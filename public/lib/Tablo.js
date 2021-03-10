@@ -34,7 +34,7 @@ function Tablo(anim) {
 
     this.init = (container) => {
 
-        // @todo Не чистим память. 1/5
+        // @todo Не чистим память. 1/5 - чистим только в destory - его не делал надо? отдельную функцию?
         const style = new PIXI.TextStyle({
             fontFamily: 'Bahnschrift',
             fontSize: 75,
@@ -44,7 +44,7 @@ function Tablo(anim) {
         });
 
 
-        // @todo Зачем нужна заглушка?
+        // @todo Зачем нужна заглушка? - это не заглушка
         text_view = new PIXI.Text('х3112.52', style);
         text_view.x = 218;
         text_view.y = 100;
