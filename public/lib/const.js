@@ -41,8 +41,7 @@ const ANIM_Button = {
     Wait_Off: "wait_off",
     Wait_On: "wait_on",
     Wait_On_Idly: "wait_on_idly",
-
-    Wait_static: "wait_static",
+    Wait_On_static: "wait_static",
 }
 
 // Main_scene
@@ -87,4 +86,36 @@ function SetPos(armature) {
     //arm_ilon.scale.set(0.5);
     armature.x = CANVAS_SIZE.width * 0.5 * armature.scale.x;
     armature.y = CANVAS_SIZE.height * 0.5 * armature.scale.y;
+}
+
+function __debug_play_anim(armature, name_anim) {
+    console.log(name_anim, "______")
+    armature.visible = true;
+    armature.animation.play(name_anim)
+
+    // if (//armature == _arms.main &&
+    //     name_anim == ANIM_Main_scene.Start)
+    //     _arms.mask.animation.play(ANIM_Mask.Start);
+}
+
+function list_animation(armature, id_cont) {
+    if (!window.HAS_DEBUG) return
+
+    const main_parent = document.getElementById('anim_btns')
+    let parent = document.getElementById(id_cont)
+    if (parent) {
+        parent.parentNode.removeChild(parent)
+    }
+
+    main_parent.appendChild(parent = document.createElement("div"))
+    parent.id = id_cont
+    parent.classList = ['debug_btn']
+    parent.innerHTML = `${id_cont}<br>`
+
+    armature.animation._animationNames.forEach((animation_name) => {
+        var btn = document.createElement("button");
+        btn.innerHTML = animation_name;
+        btn.addEventListener("click", () => { __debug_play_anim(armature, animation_name) });
+        parent.appendChild(btn);
+    })
 }

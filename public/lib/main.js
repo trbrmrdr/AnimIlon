@@ -71,28 +71,6 @@ function Anim() {
     }
 
 
-    function __debug_play_anim(armature, name_anim) {
-        console.log(name_anim, "______")
-        armature.visible = true;
-        armature.animation.play(name_anim)
-
-        // if (//armature == _arms.main &&
-        //     name_anim == ANIM_Main_scene.Start)
-        //     _arms.mask.animation.play(ANIM_Mask.Start);
-    }
-
-    // @todo дебаг-тулзы нужно вынести во что-то отдельное и просто "подписать"
-    const list_animation = (armature, id_cont) => {
-        if (!window.HAS_DEBUG) return
-        armature.animation._animationNames.forEach((animation_name) => {
-            var btn = document.createElement("button");
-            btn.innerHTML = animation_name;
-            btn.addEventListener("click", () => { __debug_play_anim(armature, animation_name) });
-            document.getElementById(id_cont).appendChild(btn);
-        })
-    }
-
-
     function start_anim(init = false) {
         if (init) {
             btn_stages = {}
@@ -124,24 +102,21 @@ function Anim() {
 
 
     var _handler_press = null,
-        _time_to_start = -1,//-1 - если соединения ещё небыло
-        _del_to_pressed = DELAY_PRESSED_BTN,
-        _time_press = 0;
+        time_start = -1;//-1 - если соединения ещё небыло
+
+    this.getTimeStarting = () => { return time_start }
 
 
-    this.hasConnected = () => {
-        return _time_to_start > 0
-    }
     /** методы для listener */
 
-    this.start_after = (_delay_ms) => {
+    this.start_after = (delay_ms) => {
         if (!isLoaded()) return
 
-        text_idly_anim()
+        tablo.text_idly_anim(room)
 
-        let _delay_to_start = Math.max(DELAY_PRESSED_BTN, _delay_ms - DELAY_PRESSED_BTN)
+        const delay_start = Math.max(DELAY_PRESSED_BTN, delay_ms - DELAY_PRESSED_BTN)
         // console.log(`ANIM start_after = ${_delay_to_start}`)
-        _time_to_start = Date.now() + _delay_to_start
+        time_start = Date.now() + delay_start
         // console.log(_delay_to_start)
 
         // перемотка из грусной эмоции
@@ -150,8 +125,8 @@ function Anim() {
             setStage(STAGE_NAMES.End)
 
             PIXI.Ticker.shared.speed =
-                (_delay_ms > 0) ?
-                    Math.max(1, Math.round(3340 / _delay_ms)) : 1.25
+                (delay_ms > 0) ?
+                    Math.max(1, Math.round(3340 / delay_ms)) : 1.25
             //анимация ожидания 1670 + переход в старт  1670
         } else {
             clearStage()
@@ -165,7 +140,7 @@ function Anim() {
         _handler_press = setTimeout(() => {
             PIXI.Ticker.shared.speed = 1
             _forces.PressBtn()
-        }, _delay_to_start)
+        }, delay_start)
     }
 
     this.in_process = () => {
@@ -191,41 +166,10 @@ function Anim() {
     }
     /* ################################# */
 
-    var _has_timer = false
-
-    // Уже описал в файле аниации текста
-    // @todo дорого так обновлять стейт
-    function text_idly_anim() {
-        function loop() {
-
-            _has_timer = _time_to_start + _time_press > 0
-            if (_has_timer) {
-                room.setState(ANIM_Room.Wait)
-
-                let now = Date.now()
-                let left = _del_to_pressed
-                if (_time_press !== 0)
-                    left = (_time_press + _del_to_pressed) - now
-
-
-                if (_time_to_start > 0) {
-                    let elapsed = _time_to_start - now
-                    // console.log(elapsed / 1000)
-                    left += elapsed
-                }
-                tablo.setLeftTime(left)
-            }
-
-            setTimeout(loop, 50);
-        }
-        loop();
-    }
-
-
     this.setMultiplier = (tick, multip) => {
         app.ticker.add(() => {
 
-            if (_has_timer) return
+            if (tablo.isTimer()) return
 
             let out_multip = 0
             if (_forces.isExploded()) {
@@ -301,8 +245,7 @@ function Anim() {
         }
 
         this.set_up_roket = () => {
-            if (_arms.main.animation.lastAnimationState &&
-                _arms.main.animation.lastAnimationState.name == ANIM_Main_scene.Wait) return;
+            if (_arms.main.animation.lastAnimationState?.name == ANIM_Main_scene.Wait) return;
             _arms.main.animation.play(ANIM_Main_scene.Reload);
         }
 
@@ -311,7 +254,7 @@ function Anim() {
 
         var _handle_started_roket = null;
         this.PressBtn = (safe = false) => {
-            _time_to_start = 0
+            time_start = 0
             if (_handler_press) clearTimeout(_handler_press)
 
             setStage(STAGE_NAMES.PressBtn, false)
@@ -321,8 +264,8 @@ function Anim() {
             this.hide_bang()
 
             /*в анимации -  задержка времени нажатия*/
-            _del_to_pressed = safe ? DELAY_PRESSED_BTN * 0.5 : DELAY_PRESSED_BTN
-            _time_press = Date.now()
+            const del = safe ? DELAY_PRESSED_BTN * 0.5 : DELAY_PRESSED_BTN
+            tablo.pressBtn(Date.now(), del)
 
             //начало старта
             if (_handle_started_roket) clearTimeout(_handle_started_roket)
@@ -333,9 +276,8 @@ function Anim() {
                 _type_start = 3
 
                 PIXI.Ticker.shared.speed = 1;
-                _time_press = 0
-                _del_to_pressed = DELAY_PRESSED_BTN
-            }, _del_to_pressed);
+                tablo.pressBtn(0, DELAY_PRESSED_BTN)
+            }, del);
 
             _arms.ilon.animation.play(ANIM_Ilon.Press_Button);
             _type_start = 0
@@ -403,8 +345,8 @@ function Anim() {
                 // arm_ilon.animation.fadeIn(ANIM_Ilon.Press_Button);
 
                 //по таймеру включится кнопка - пока ждём и перключаем анимации ожидания
-                if (_time_to_start > 0 && _isActive(STAGE_NAMES.PressBtn, false)) {
-                    let elapsed = _time_to_start - Date.now()
+                if (time_start > 0 && _isActive(STAGE_NAMES.PressBtn, false)) {
+                    let elapsed = time_start - Date.now()
                     if (elapsed <= 2500) {
                         // console.log('elapsed', elapsed)
                         _arms.ilon.animation.play(ANIM_Ilon.Wait);
@@ -539,7 +481,7 @@ function Anim() {
         _arms.main = pf_parsed.buildArmatureDisplay('Main_scene');
         _arms.main.on(dragonBones.EventObject.LOOP_COMPLETE, _ActionEventHandler＿main, this);
         SetPos(_arms.main)
-        list_animation(_arms.main, "anim_roket")
+        list_animation(_arms.main, 'Main_scene')
         //______________________________________________________________________________________________
 
         bang = new Bang(pf_parsed)
@@ -624,19 +566,13 @@ function Anim() {
             }
 
             var _app_runing = true
-            window.addEventListener(
-                "keydown", event => {
-                    if (event.key === " ") {
-                        _app_runing = !_app_runing
-                        if (_app_runing)
-                            app.start()
-                        else
-                            app.stop()
-
-                        event.preventDefault();
-                    }
-                }, false
-            );
+            window.addEventListener("keydown", event => {
+                if (event.key === " ") {
+                    _app_runing = !_app_runing
+                    _app_runing ? app.start() : app.stop()
+                    event.preventDefault();
+                }
+            }, false);
 
         } else {
             app.stage.addChild(main_view = new PIXI.Container())
@@ -653,7 +589,7 @@ function Anim() {
 
 
         if (window.HAS_STATS) {
-            var stats = new Stats();
+            const stats = new Stats();
             stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 
             stats.dom.style.left = '480px';
@@ -666,13 +602,19 @@ function Anim() {
         return this;
     }
 
-    this.destroy = () => {
-        /* while (app.stage.children[0]) {
-            app.stage.removeChild(app.stage.children[0])
-            spr.destroy({children: true, texture: true, baseTexture: false});
-        } */
 
+    this.getApp = () => { return app }
+    this.destroy = () => {
+        main_view.destroy()
         app.destroy()
+        app = null
+        PIXI.Loader.shared.reset()
+        PIXI.utils.clearTextureCache()
+        // PIXI.utils.destroyTextureCache()
+        Object.entries(btn_stages).forEach((el) => {
+            el[1].parentNode?.removeChild(el[1])
+        })
+        btn_stages = undefined
     }
 
 

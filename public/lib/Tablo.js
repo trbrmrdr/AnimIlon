@@ -1,5 +1,3 @@
-// @todo Лучше сделать через css, канвас менять дороже
-// Если остается канвас, шрифт надо подгружать в пикси
 function Tablo(anim) {
 
     var text_view;
@@ -19,22 +17,56 @@ function Tablo(anim) {
     ];
 
     this.updateIdly = () => {
-        if (main_anim.hasConnected()) return
+        if (main_anim.getTimeStarting() > 0) return
 
         text_view.text = fii[Math.floor((Date.now() / 100) % fii.length)];
     }
 
-    this.setLeftTime = (msec) => {
-        text_view.text = `${(msec / 1000).toFixed(2)}sec`
-    }
 
     this.setMultiplier = (multiplier) => {
         text_view.text = `x${multiplier.toFixed(2)}`
     }
 
+    var timePressesBtn = 0,
+        delPressed = DELAY_PRESSED_BTN
+    this.pressBtn = (time, delay) => {
+        timePressesBtn = time
+        delPressed = delay
+    }
+    this.isTimer = () => { return hasTimer }
+
+    var hasTimer = false
+    this.text_idly_anim = (room) => {
+
+        function loop() {
+            if (!main_anim.getApp()) return
+
+            const time_to_start = main_anim.getTimeStarting()
+            hasTimer = time_to_start + timePressesBtn > 0
+            if (hasTimer) {
+                room.setState(ANIM_Room.Wait)
+
+                let now = Date.now()
+                let left = delPressed
+                if (timePressesBtn !== 0) {
+                    left = (timePressesBtn + delPressed) - now
+                }
+
+                if (time_to_start > 0) {
+                    let elapsed = time_to_start - now
+                    // console.log(elapsed / 1000)
+                    left += elapsed
+                }
+                text_view.text = `${(left / 1000).toFixed(2)}sec`
+            }
+
+            setTimeout(loop, 50);
+        }
+        loop();
+    }
+
     this.init = (container) => {
 
-        // @todo Не чистим память. 1/5 - чистим только в destory - его не делал надо? отдельную функцию?
         const style = new PIXI.TextStyle({
             fontFamily: 'Bahnschrift',
             fontSize: 75,
@@ -43,8 +75,6 @@ function Tablo(anim) {
             letterSpacing: 2,
         });
 
-
-        // @todo Зачем нужна заглушка? - это не заглушка
         text_view = new PIXI.Text('х3112.52', style);
         text_view.x = 218;
         text_view.y = 100;

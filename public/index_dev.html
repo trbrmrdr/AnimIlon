@@ -44,15 +44,17 @@
 
     <div id="stages" style="padding: 5px;
     border: solid 2px green;
-    margin: 5px;">Очередь для сценки<br></div>
+    margin: 5px;">Очередь для сценки<br>
+    </div>
 
 
     <div id="events" style="padding: 5px;
     border: solid 2px rgb(155, 52, 214);
-    margin: 5px;"><br>События с input - Date.now()+сек.
+    margin: 5px;">
 
-        <br><button onclick="window.destory(this)" checked>Destroy</button>
+        <br><button id='btn_creater' onclick="window.reset(this)">Create</button>
 
+        <br>События с input - Date.now()+сек.
         <br><button type="serve_checker" style="color: green;" onclick="window.check_server(this)"
             checked>Сервер</button>
         <br />
@@ -61,15 +63,11 @@
 
 
     <div id="canvas-container">
-        <!--контейнер где лежит canvas с нужными размерами-->
         <canvas id="canvas"></canvas>
-        <!--сам canvas на котором рисуется анимашку-->
     </div>
 
-    <div id="anim_ilon" class="debug_btn">Анимации Илона<br></div>
-    <div id="anim_button" class="debug_btn">Анимации Кнопки<br></div>
-    <div id="anim_roket" class="debug_btn">Анимации Рокеты<br></div>
-    <div id="anim_Bang" class="debug_btn">Взрыв<br></div>
+    <div id="anim_btns">
+    </div>
 
     <script>
 
@@ -79,15 +77,18 @@
         var is_inited = false
 
         window.onload = function () {
-            init_anim()
+            window.reset(document.getElementById('btn_creater'))
         }
 
-        window.destory = (btn) => {
+        window.reset = (btn) => {
             if (is_inited) {
                 btn.innerHTML = "Create"
+
+                window.listener.disconnect()
                 window.anim.destroy()
                 is_inited = false
             } else {
+
                 btn.innerHTML = "Destory"
                 init_anim()
             }
@@ -96,10 +97,11 @@
 
         function init_anim() {
             is_inited = true
-            const _anim = new Anim().init()
-            window.anim = _anim
+
+            window.anim = new Anim().init()
             // return
-            const _listener = new Listener(_anim).connectToServer('wss://ws.rocketcrash.vip/ws')
+            const _listener = new Listener(window.anim).connectToServer('wss://ws.rocketcrash.vip/ws')
+            window.listener = _listener
 
             //Debug
             if (true) {

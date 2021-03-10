@@ -1,13 +1,13 @@
 // @todo Не хватает описания того, что происходит в контейнере человекопонятным языком
 function Stars(app) {
 
-    const star_width = CANVAS_SIZE.width * 0.4,
+    const fieldSpeed = .3,
+        star_width = CANVAS_SIZE.width * 0.4,
         star_height = CANVAS_SIZE.height,
         container = new PIXI.Container(),
         numStars = 400;
 
     var is_work = false
-    const fieldSpeed = .3
 
     this.getContainer = () => { return container; }
 
