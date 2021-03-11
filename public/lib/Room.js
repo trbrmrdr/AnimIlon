@@ -28,7 +28,7 @@ function Room(anim) {
 
     function _setState(state, is_safe) {
         if (!button_armature) return
-        if (is_safe && !main_anim.getTimeStarting()) return
+        if (is_safe && main_anim.getTimeStarting() < 0) return
         const factory = dragonBones.PixiFactory.factory;
         const slot_knopka = button_armature.armature.getSlot("knopka_off");
 

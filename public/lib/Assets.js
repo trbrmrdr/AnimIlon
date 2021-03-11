@@ -2,8 +2,9 @@
 
 
 
-const name_anim = 'Ilon'
+// const name_anim = 'Ilon'
 // const name_anim = 'Ilon_cut_1'
+const name_anim = 'Ilon_optimization'
 const ASSETS = {
     black_back: '/data/10px_back.jpg',
     star: '/data/star.png',

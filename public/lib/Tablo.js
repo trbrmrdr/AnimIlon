@@ -36,34 +36,32 @@ function Tablo(anim) {
     this.isTimer = () => { return hasTimer }
 
     var hasTimer = false
-    this.text_idly_anim = (room) => {
+    this.update_text = (room) => {
+        if (!main_anim.getApp()) return
 
-        function loop() {
-            if (!main_anim.getApp()) return
+        const time_to_start = main_anim.getTimeStarting()
 
-            const time_to_start = main_anim.getTimeStarting()
-            hasTimer = time_to_start + timePressesBtn > 0
-            if (hasTimer) {
-                room.setState(ANIM_Room.Wait)
+        hasTimer = time_to_start + timePressesBtn > 0
+        if (hasTimer == false) return
 
-                let now = Date.now()
-                let left = delPressed
-                if (timePressesBtn !== 0) {
-                    left = (timePressesBtn + delPressed) - now
-                }
+        room.setState(ANIM_Room.Wait)
 
-                if (time_to_start > 0) {
-                    let elapsed = time_to_start - now
-                    // console.log(elapsed / 1000)
-                    left += elapsed
-                }
-                text_view.text = `${(left / 1000).toFixed(2)}sec`
-            }
-
-            setTimeout(loop, 50);
+        let now = Date.now()
+        let left = delPressed
+        if (timePressesBtn !== 0) {
+            left = (timePressesBtn + delPressed) - now
         }
-        loop();
+
+        if (time_to_start > 0) {
+            let elapsed = time_to_start - now
+            // console.log(elapsed / 1000)
+            left += elapsed
+        }
+        text_view.text = `${(left / 1000).toFixed(2)}sec`
+
+
     }
+
 
     this.init = (container) => {
 

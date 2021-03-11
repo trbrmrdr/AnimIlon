@@ -7,12 +7,10 @@ function Stars(app) {
         container = new PIXI.Container(),
         numStars = 400;
 
-    var is_work = false
-
     this.getContainer = () => { return container; }
 
     this.setEnable = (enable) => {
-        is_work = enable
+        particle_containter.renderable = enable
     }
 
     // @todo Все ассеты нужно вынести в какой-нибудь реестр или синглотон, чтобы не плодить сущности.
@@ -63,9 +61,8 @@ function Stars(app) {
         star.position.y -= Math.sign(fieldSpeed) * star_height;
     }
 
-    // @todo Очень похоже, что здесь на каждый тик происходит огромнейшее количество операций, учитывая кол-во "stars"
-    app.ticker.add(function (delta) {
-        if (!is_work) return;
+    this.update = (delta) => {
+        if (!particle_containter.renderable) return;
 
         particle_containter.children.map(star => {
 
@@ -88,7 +85,7 @@ function Stars(app) {
             }
         });
 
-    });
+    }
 
 
 

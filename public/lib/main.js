@@ -112,8 +112,6 @@ function Anim() {
     this.start_after = (delay_ms) => {
         if (!isLoaded()) return
 
-        tablo.text_idly_anim(room)
-
         const delay_start = Math.max(DELAY_PRESSED_BTN, delay_ms - DELAY_PRESSED_BTN)
         // console.log(`ANIM start_after = ${_delay_to_start}`)
         time_start = Date.now() + delay_start
@@ -146,14 +144,14 @@ function Anim() {
     this.in_process = () => {
         if (!isLoaded()) return
 
-        room.setState(ANIM_Room.Work, true)
+        room?.setState(ANIM_Room.Work, true)
         _forces.PressBtn(true)
     }
 
     this.completed = () => {
         if (!isLoaded()) return
 
-        room.setState(ANIM_Room.Stop, true)
+        room?.setState(ANIM_Room.Stop, true)
         setStage(STAGE_NAMES.End_wait)
         _forces.Exploded(true)
     }
@@ -161,15 +159,16 @@ function Anim() {
     this.set_win = (has_win) => {
         if (!isLoaded()) return
 
-        if (has_win)
-            room.setState(ANIM_Room.Win, true)
+        if (has_win) {
+            room?.setState(ANIM_Room.Win, true)
+        }
     }
     /* ################################# */
 
     this.setMultiplier = (tick, multip) => {
         app.ticker.add(() => {
 
-            if (tablo.isTimer()) return
+            if (tablo?.isTimer()) return
 
             let out_multip = 0
             if (_forces.isExploded()) {
@@ -187,13 +186,13 @@ function Anim() {
                     // _forces.TwoHand()
                 }
             } else {
-                tablo.updateIdly()
+                tablo?.updateIdly()
                 return
             }
 
             out_multip = Math.min(out_multip, MAX_MULTIP)
 
-            tablo.setMultiplier(out_multip)
+            tablo?.setMultiplier(out_multip)
 
         });
     }
@@ -231,13 +230,13 @@ function Anim() {
         }
 
         this.hide_bang = () => {
-            if (bang.Hide()) {
-                _arms.main.animation.play(ANIM_Main_scene.Reload);
+            if (bang?.Hide()) {
+                _arms.main?.animation.play(ANIM_Main_scene.Reload);
             }
         }
 
         this.set_up_button = () => {
-            if (!room.setUp()) return
+            if (!room?.setUp()) return
 
             _timer_see_watch = Date.now()
             // Илон ещё выходит из грусной эмойии
@@ -245,8 +244,8 @@ function Anim() {
         }
 
         this.set_up_roket = () => {
-            if (_arms.main.animation.lastAnimationState?.name == ANIM_Main_scene.Wait) return;
-            _arms.main.animation.play(ANIM_Main_scene.Reload);
+            if (_arms.main?.animation.lastAnimationState?.name == ANIM_Main_scene.Wait) return;
+            _arms.main?.animation.play(ANIM_Main_scene.Reload);
         }
 
         var _type_start = -1
@@ -265,18 +264,18 @@ function Anim() {
 
             /*в анимации -  задержка времени нажатия*/
             const del = safe ? DELAY_PRESSED_BTN * 0.5 : DELAY_PRESSED_BTN
-            tablo.pressBtn(Date.now(), del)
+            tablo?.pressBtn(Date.now(), del)
 
             //начало старта
             if (_handle_started_roket) clearTimeout(_handle_started_roket)
             _handle_started_roket = setTimeout(() => {
-                room.setState(ANIM_Room.Work)
+                room?.setState(ANIM_Room.Work)
                 _main_scene_is_started = true
-                _arms.main.animation.play(ANIM_Main_scene.Start);
+                _arms.main?.animation.play(ANIM_Main_scene.Start);
                 _type_start = 3
 
                 PIXI.Ticker.shared.speed = 1;
-                tablo.pressBtn(0, DELAY_PRESSED_BTN)
+                tablo?.pressBtn(0, DELAY_PRESSED_BTN)
             }, del);
 
             _arms.ilon.animation.play(ANIM_Ilon.Press_Button);
@@ -289,7 +288,7 @@ function Anim() {
         this.RoketTakes = () => {
             _type_start = 1
             _arms.ilon.animation.play(ANIM_Ilon.RocketTakes_Start);
-            room.Off()
+            room?.Off()
         }
 
         this.TwoHand = () => {
@@ -310,10 +309,10 @@ function Anim() {
 
             if (safe) {
                 if (_main_scene_is_started) {
-                    _arms.main.animation.play(ANIM_Main_scene.Wait);
-                    bang.toLoop()
+                    _arms.main?.animation.play(ANIM_Main_scene.Wait);
+                    bang?.toLoop()
                 } else {
-                    bang.toBang()
+                    bang?.toBang()
 
                 }
             }
@@ -374,7 +373,7 @@ function Anim() {
                 PIXI.Ticker.shared.speed = 1;
                 // if (event.animationState.name !== ANIM_Ilon.Press_Button_Wait)
                 _arms.ilon.animation.play(ANIM_Ilon.Press_Button_Wait);
-                room.Off()
+                room?.Off()
                 break;
 
             case ANIM_Ilon.RocketTakes_Start:
@@ -457,9 +456,9 @@ function Anim() {
         lon: null,
     };
 
-    var stars, clip_mask, bang;
-    var room = new Room(this)
-    var tablo = new Tablo(this)
+    var stars, clip_mask, bang
+    const room = new Room(this)
+    const tablo = new Tablo(this)
 
     function _onAssetsLoaded(loader, res) {
 
@@ -485,19 +484,25 @@ function Anim() {
         //______________________________________________________________________________________________
 
         bang = new Bang(pf_parsed)
-
         //_____________________________________________________________________________________________
+
         tablo.init(main_view)
 
         //______________________________________________________________________________________________
+
         main_view.addChild(_arms.ilon)
+
 
         stars = new Stars(app)
 
-        //в проекте управление маской происходит - в коде ест ьпротупы если проект неактивен!!!!!!!!!!!!
+        //в проекте управление маской происходит - в коде есть протупы если проект неактивен!!!!!!!!!!!!
         clip_mask = new ClipMask(main_view, _arms.main)
 
-        app.ticker.add(() => {
+
+        app.ticker.add((delta) => {
+            tablo?.update_text(room)
+            stars?.update(delta)
+
             clip_mask.update(app, main_view,
                 _arms.main,
                 bang.getArmature(),
