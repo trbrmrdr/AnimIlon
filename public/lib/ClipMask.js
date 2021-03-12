@@ -4,13 +4,13 @@
 
 По коду ниже слонжо что-то сказать, мало что понятно
  */
-function ClipMask(container, main_scene_armature) {
+function ClipMask(container, roket_scene_armature) {
 
     var mask_armature;
 
     this.update = (
         app, container,
-        main_scene_armature,
+        roket_scene_armature,
         bang_armature,
         stars) => {
 
@@ -22,31 +22,16 @@ function ClipMask(container, main_scene_armature) {
         container.setChildIndex(rt_roket_zone.sprite, container.children.length - 1)
 
         app.renderer.render(stars.getContainer(), rt_roket_zone.rt);
-        app.renderer.render(main_scene_armature, rt_roket_zone.rt, false);
+        app.renderer.render(roket_scene_armature, rt_roket_zone.rt, false);
         app.renderer.render(bang_armature, rt_roket_zone.rt, false);
 
-        // _arms.main.mask = rt_mask.s
-        // _arms.bang.mask = rt_mask.s
         rt_roket_zone.sprite.mask = rt_mask.sprite
-
-        // console.log(_arms.main.animation);
     }
 
-    function create_rt() {
-        const baseRenderTexture = new PIXI.BaseRenderTexture({
-            width: CANVAS_SIZE.width,
-            height: CANVAS_SIZE.height
-        });
-
-        const rt = new PIXI.RenderTexture(baseRenderTexture)
-        return {
-            rt: rt,
-            sprite: new PIXI.Sprite(rt),
-        }
-    }
+    
 
 
-    main_scene_armature.children.forEach((el) => {
+    roket_scene_armature.children.forEach((el) => {
         if (mask_armature) return
         if (el instanceof dragonBones.PixiArmatureDisplay) {
             if (el.armature.name == "Mask") {
@@ -56,8 +41,8 @@ function ClipMask(container, main_scene_armature) {
     })
 
 
-    const rt_mask = create_rt()
-    const rt_roket_zone = create_rt()
+    const rt_mask = create_rt(CANVAS_SIZE)
+    const rt_roket_zone = create_rt(CANVAS_SIZE)
 
     container.addChild(
         rt_mask.sprite,

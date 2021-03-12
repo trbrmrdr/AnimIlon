@@ -95,9 +95,11 @@ function Anim() {
         _arms.ilon.animation.play(ANIM_Ilon.Wait);
 
         _forces.set_up_button();
-        // _arms.mask.animation.play(ANIM_Mask.Wait);
         _forces.hide_bang()
         _forces.set_up_roket();
+
+        //если выклчим сервер то при старте ракета будет в космосе сразу
+        // __debug_play_anim(_arms.main,ANIM_Main_scene.Fly_circle)
     }
 
 
@@ -465,7 +467,18 @@ function Anim() {
         const pf_parsed = dragonBones.PixiFactory.factory;
 
         pf_parsed.parseDragonBonesData(res.skeleton.data);
-        pf_parsed.parseTextureAtlasData(res.texture_json.data, res.texture_png.texture);
+        if (ASSETS.atlas_json instanceof Array) {
+
+            ASSETS.atlas_json.forEach((el, i) => {
+                pf_parsed.parseTextureAtlasData(
+                    res[`texture_json_${i}`].data,
+                    res[`texture_png_${i}`].texture
+                );
+            })
+        } else {
+            pf_parsed.parseTextureAtlasData(res.texture_json.data, res.texture_png.texture);
+        }
+
 
         //______________________________________________________________________________________________
         _arms.ilon = pf_parsed.buildArmatureDisplay('Ilon');
@@ -586,11 +599,22 @@ function Anim() {
         onResizeWindow()
 
 
-        PIXI.Loader.shared
-            .add('skeleton', ASSETS.anim_ske)
-            .add('texture_json', ASSETS.atlas_json)
-            .add('texture_png', ASSETS.atlas_png)
-            .load(_onAssetsLoaded);
+
+        PIXI.Loader.shared.add('skeleton', ASSETS.anim_ske)
+
+        if (ASSETS.atlas_json instanceof Array) {
+            ASSETS.atlas_json.forEach((el, i) => {
+                PIXI.Loader.shared
+                    .add(`texture_json_${i}`, ASSETS.atlas_json[i])
+                    .add(`texture_png_${i}`, ASSETS.atlas_png[i])
+            })
+        } else {
+            PIXI.Loader.shared
+                .add('texture_png', ASSETS.atlas_png)
+                .add('texture_json', ASSETS.atlas_json)
+        }
+
+        PIXI.Loader.shared.load(_onAssetsLoaded);
 
 
         if (window.HAS_STATS) {
@@ -611,11 +635,10 @@ function Anim() {
     this.getApp = () => { return app }
     this.destroy = () => {
         main_view.destroy()
-        app.destroy()
-        app = null
+        app.destroy(), app = null
         PIXI.Loader.shared.reset()
         PIXI.utils.clearTextureCache()
-        // PIXI.utils.destroyTextureCache()
+        PIXI.utils.destroyTextureCache()
         Object.entries(btn_stages).forEach((el) => {
             el[1].parentNode?.removeChild(el[1])
         })
@@ -674,8 +697,12 @@ function Anim() {
     }
 
     function onResizeWindow() {
-        const new_width = canvas_container.clientWidth
-        const new_height = new_width / CANVAS_SIZE.width * CANVAS_SIZE.height;
+        let new_width = canvas_container.clientWidth
+        let new_height = new_width / CANVAS_SIZE.width * CANVAS_SIZE.height;
+        if (canvas_container.clientWidth < canvas_container.clientHeight) {
+
+
+        }
 
         app.renderer.resize(new_width, new_height)
         main_view.scale.set(new_width / CANVAS_SIZE.width);

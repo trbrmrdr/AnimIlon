@@ -131,16 +131,17 @@ function Listener(anim) {
             );
             break;
           case 'playerUpdate':
-            console.log(message.payload)
+            // console.log(message.payload)
             if (_user_id == -1) {
               _user_id = message.payload.player.user_id
+              console.log(`user id =${_user_id}`)
             }
-            // let tlog = ''
+            let tlog = ''
             if (_user_id == message.payload.player.user_id) {
-              // tlog += '\n\tlistener ->' + message.payload.player.out_at_multiplier
+              tlog += '\n\tlistener ->' + message.payload.player.out_at_multiplier
               main_anim.set_win(message.payload.player.out_at_multiplier > 1.0)
             }
-            // console.log(message.payload.player.user_id + " ->" + message.payload.player.out_at_multiplier + tlog)
+            console.log(message.payload.player.user_id + " ->" + message.payload.player.out_at_multiplier + tlog)
             break;
           case 'onlineUpdate':
             // console.log(message.payload)

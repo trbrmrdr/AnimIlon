@@ -78,6 +78,7 @@ const ANIM_Room = {
 const CANVAS_SIZE = {
     width: 840,//420,
     height: 562,//281,
+    ///375x187
 }
 
 const MAX_MULTIP = 3112.52
@@ -118,4 +119,35 @@ function list_animation(armature, id_cont) {
         btn.addEventListener("click", () => { __debug_play_anim(armature, animation_name) });
         parent.appendChild(btn);
     })
+}
+
+
+function create_rt(size) {
+    const baseRenderTexture = new PIXI.BaseRenderTexture({
+        width: size.width,
+        height: size.height
+    });
+
+    const rt = new PIXI.RenderTexture(baseRenderTexture)
+    return {
+        rt: rt,
+        sprite: new PIXI.Sprite(rt),
+    }
+}
+
+function drawCircle(x, y, radius, fillColor, lineWidth, lineColor ) {
+    const circle = new PIXI.Graphics();
+
+    if (fillColor) {
+        circle.beginFill(fillColor);
+    }
+
+    if (lineColor && lineWidth) {
+        circle.lineStyle(lineWidth, lineColor);
+    }
+
+    circle.drawCircle(x, y, radius);
+    circle.endFill();
+
+    return circle;
 }

@@ -17,7 +17,7 @@ function Tablo(anim) {
     ];
 
     this.updateIdly = () => {
-        if (main_anim.getTimeStarting() > 0) return
+        if (main_anim.getTimeStarting() >= 0) return
 
         text_view.text = fii[Math.floor((Date.now() / 100) % fii.length)];
     }

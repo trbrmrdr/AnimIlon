@@ -78,7 +78,7 @@ gulp.task('server', gulp.series('scripts', function (done) {
     gulp.watch("*.js").on('change', browserSync.reload);
 
     gulp.watch("./public/*.html").on('change', browserSync.reload);
-    gulp.watch("./public/data/*.*").on('change', browserSync.reload);
+    gulp.watch("./public/data/ver_*/*.*").on('change', browserSync.reload);
 }));
 
 gulp.task('default', gulp.series('server'));

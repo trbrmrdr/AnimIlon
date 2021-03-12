@@ -102,7 +102,8 @@
             // return
             const _listener = new Listener(window.anim).connectToServer('wss://ws.rocketcrash.vip/ws')
             window.listener = _listener
-
+            
+            _listener.disconnect()
             //Debug
             if (true) {
 
