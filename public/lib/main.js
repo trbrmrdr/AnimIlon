@@ -696,7 +696,18 @@ function Anim() {
         }
     }
 
+    function size_looper() {
+        resizeThrottler()
+        setTimeout(size_looper, 250)
+    }
+
+    size_looper()
+    
+    var canvas_container_size = { width: 0, height: 0 }
     function onResizeWindow() {
+        if (canvas_container_size.width === canvas_container.clientWidth) return
+        canvas_container_size.width = canvas_container.clientWidth
+
         let new_width = canvas_container.clientWidth
         let new_height = new_width / CANVAS_SIZE.width * CANVAS_SIZE.height;
         if (canvas_container.clientWidth < canvas_container.clientHeight) {

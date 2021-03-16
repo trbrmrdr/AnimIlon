@@ -4,6 +4,7 @@
         html {
             margin: 0px;
             height: 100%;
+            overflow: hidden;
         }
         #canvas-container {
             width: 100vw;
@@ -14,10 +15,8 @@
 </head>
 
 <body>
-
     <script src="./lib/v6.0.0-rc.2/pixi.js"></script>
-    <script src="./dist/main.js?v=2.7"></script>
-
+    <script src="./dist/main.js?v=2.9"></script>
     <div id="canvas-container">
         <canvas id="canvas"></canvas>
     </div>
@@ -27,8 +26,4 @@
             const _listener = new Listener(_anim).connectToServer('wss://ws.rocketcrash.vip/ws')
         }
     </script>
-
-
-
-
 </body>
