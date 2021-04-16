@@ -70,3 +70,6 @@ public/dist/
 
 public/lib/GradientResource.js
 public/lib/helper.js
+
+.DS_store
+.idea
